@@ -2,13 +2,89 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
-      <Label layoutX="329.0" layoutY="14.0" text="Тестовая программа" />
-      <Button fx:id="btn_print" layoutX="43.0" layoutY="70.0" mnemonicParsing="false" text="Button" />
-      <TextField fx:id="textfield" layoutX="170.0" layoutY="70.0" />
+      <GridPane layoutX="14.0" layoutY="14.0" prefHeight="553.0" prefWidth="760.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="195.0" minHeight="10.0" prefHeight="57.0" vgrow="NEVER" />
+          <RowConstraints maxHeight="726.0" minHeight="10.0" prefHeight="682.0" vgrow="ALWAYS" />
+        </rowConstraints>
+         <children>
+            <Label alignment="CENTER" text="Лексический анализатор" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <font>
+                  <Font size="33.0" />
+               </font>
+            </Label>
+            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" GridPane.rowIndex="1">
+              <tabs>
+                <Tab text="Анализатор">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <GridPane layoutX="53.0" layoutY="45.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="163.0" minHeight="0.0" prefHeight="33.0" vgrow="NEVER" />
+                                  <RowConstraints maxHeight="405.0" minHeight="10.0" prefHeight="157.0" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="40.0" vgrow="NEVER" />
+                                    <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="32.0" vgrow="NEVER" />
+                                    <RowConstraints maxHeight="513.0" minHeight="10.0" prefHeight="269.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="45.0" vgrow="NEVER" />
+                                    <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="144.0" vgrow="ALWAYS" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="Исходный текст для разбора" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                       <font>
+                                          <Font size="20.0" />
+                                       </font>
+                                    </Label>
+                                    <TextArea fx:id="textfield_input" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+                                    <Button fx:id="button_parse" mnemonicParsing="false" prefHeight="31.0" prefWidth="400.0" text="Разобрать" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                    <Label text="Таблица лексем" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                       <font>
+                                          <Font size="20.0" />
+                                       </font>
+                                    </Label>
+                                    <TableView fx:id="table_lexemas" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4" />
+                                    <Label text="Последовательность лексем" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+                                       <font>
+                                          <Font size="20.0" />
+                                       </font>
+                                    </Label>
+                                    <TextArea fx:id="textfield_output" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="6" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Хеш-таблица">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TableView fx:id="table_hashtable" layoutX="248.0" layoutY="175.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </children>
+      </GridPane>
    </children>
 </AnchorPane>

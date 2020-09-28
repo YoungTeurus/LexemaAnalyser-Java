@@ -54,10 +54,10 @@ public final class Lexema {
     public enum possible_types{
         INT_CONST("Целочисленная константа"),
         FLOAT_CONST("Вещественная константа"),
-        VARIABLE("Булева константа"),
-        OPERATOR("Переменная"),
-        SPLITTER("Оператор"),
-        BOOL_CONST("Разделитель");
+        VARIABLE("Переменная"),
+        OPERATOR("Оператор"),
+        SPLITTER("Разделитель"),
+        BOOL_CONST("Булева константа");
 
         private final String _description;
 
@@ -147,6 +147,7 @@ public final class Lexema {
             case VARIABLE:
                 return "Переменная " + _id;
             case OPERATOR:
+            case SPLITTER:
                 return _char;
         }
         return "Нераспознанная лексема " + _id;
