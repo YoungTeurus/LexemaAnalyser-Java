@@ -1,9 +1,19 @@
 package objects;
 
+import interfaces.IHashFunction;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Parcer {
+    public static class ParcerOutput{
+        public List<Lexema> object_lexema_list;
+        public HashTable hashTable;
+        public List<Lexema> output_lexema_list;
+    }
+
+    static int DEFAULT_HASH_TABLE_SIZE = 255; // Длина хеш-таблицы
+
     /**
      * Метод подготавливает исходную строку для прохода парсера.
      * Убирает все переносы строк.
@@ -80,5 +90,31 @@ public class Parcer {
         }
 
         return return_list;
+    }
+
+    /**
+     * Возвращает два объекта: список объектов-лексем и словарь типа "строковая лексема - объект-лексема".
+     * @param unique_str_lexema_list Список уникальных строковых лексем
+     * @return ParcerOutput с двумя заполненными полями: списком объектов-лексем и хеш-таблицей, содержащей объекты-лексемы.
+     */
+    public static ParcerOutput get_object_lexema_list_and_str_object_lexema_hash_table(List<String> unique_str_lexema_list){
+        ParcerOutput parcerOutput = new ParcerOutput();
+
+        int hash_table_size = DEFAULT_HASH_TABLE_SIZE;
+        UniversalHashFunction_ForString hash_function = new UniversalHashFunction_ForString(hash_table_size);
+        HashTable hashTable = new HashTable(hash_table_size, hash_function);
+
+        List<Lexema> object_lexema_list = new ArrayList<Lexema>();
+        int i = 0;
+        for (String str_lexema : unique_str_lexema_list){
+            Lexema obj_lexema = new Lexema(str_lexema, i); // Создание объектов-лексем
+            object_lexema_list.add(obj_lexema); // Список объектов-лексем
+            hashTable.insert(str_lexema, obj_lexema); // Добавляем в хеш-таблицу лексемы.
+        }
+
+        parcerOutput.object_lexema_list = object_lexema_list;
+        parcerOutput.hashTable = hashTable;
+
+        return parcerOutput;
     }
 }

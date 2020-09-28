@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import objects.HashTable;
+import objects.ListUniqieer;
 import objects.Parcer;
 import objects.UniversalHashFunction_ForString;
 
@@ -27,15 +28,19 @@ public class Main extends Application {
         String str_lex = "a = b + c + a";
         List<String> str_lexes = Parcer.get_lexemas(str_lex);
 
-        UniversalHashFunction_ForString hf = new UniversalHashFunction_ForString(33);
-        HashTable ht = new HashTable(33, hf);
+        // UniversalHashFunction_ForString hf = new UniversalHashFunction_ForString(33);
+        // HashTable ht = new HashTable(33, hf);
 
-        for (String lex : str_lexes){
-            System.out.println(ht.insert(lex, null));
-        }
+        // for (String lex : str_lexes){
+        //     System.out.println(ht.insert(lex, null));
+        // }
 
-        for (String lex : str_lexes){
-            System.out.println(ht.get_value(lex, null));
-        }
+        // for (String lex : str_lexes){
+        //     System.out.println(ht.get_value(lex, null));
+        // }
+
+        str_lexes = new ListUniqieer<String>().unique_list(str_lexes);
+        Parcer.ParcerOutput po = Parcer.get_object_lexema_list_and_str_object_lexema_hash_table(str_lexes);
+        System.out.println(po);
     }
 }
