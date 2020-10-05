@@ -1,6 +1,7 @@
-package objects;
+package objects.LexemaParcer;
 
-import interfaces.IHashFunction;
+import objects.Hashing.HashTable;
+import objects.Hashing.UniversalHashFunction_ForString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,18 +52,18 @@ public class Parcer {
                 continue;
             }
             // Если новая лексема начинается с символа, который есть у опреатора:
-            if (Lexema.is_start_of_any_reserved_lexema(current_lexema.toString())){
+            if (Lexema.is_start_of_splitter(current_lexema.toString())){
                 // Начинаем искать конец сплиттера
                 next_char_i = lex_start + 1;
                 while (next_char_i < string_len){
                     next_char = input_string.charAt(next_char_i);
-                    if (Lexema.is_start_of_any_reserved_lexema(current_lexema.toString() + next_char)){
+                    if (Lexema.is_start_of_splitter(current_lexema.toString() + next_char)){
                         current_lexema.append(next_char);
                         next_char_i += 1;
                         lex_start += 1;
                     }
                     else{
-                        if (Lexema.is_any_reserved_lexema(current_lexema.toString())){
+                        if (Lexema.is_splitter(current_lexema.toString())){
                             // Если уже составили сплиттер, прекращаем обход
                             not_splitter_lexema = false;
                         }
@@ -130,7 +131,7 @@ public class Parcer {
         for (String str_lexema : str_lexema_list){
             output_lexema_list.add(
                     // Сопоставляем последовательность строковых лексем и лексем-объектов
-                    (Lexema)hash_table.get_value(str_lexema, new String_Object_LexemaComparator())
+                    new Lexema((Lexema)hash_table.get_value(str_lexema, new String_Object_LexemaComparator()))
             );
         }
         return output_lexema_list;

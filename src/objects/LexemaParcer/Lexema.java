@@ -1,4 +1,4 @@
-package objects;
+package objects.LexemaParcer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,7 @@ public final class Lexema {
     /**
      * Возвращает True, если переданная строка является началом любого разделяющего оператора.
      */
-    public static boolean is_start_of_any_reserved_lexema(String str){
+    public static boolean is_start_of_splitter(String str){
         for (String splitter: splitters) {
             if (splitter.startsWith(str))
                 return true;
@@ -28,7 +28,7 @@ public final class Lexema {
     /**
      * Возвращает True, если переданная строка является любым разделителем.
      */
-    public static boolean is_any_reserved_lexema(String str){
+    public static boolean is_splitter(String str){
         for (String splitter: splitters) {
             if (splitter.equals(str))
                 return true;
@@ -51,7 +51,7 @@ public final class Lexema {
      * Возможные типы лексем с человеко-понятным описанием.
      * Метод get_description возвращает описание.
      */
-    public enum possible_types{
+    public enum lexema_types {
         INT_CONST("Целочисленная константа"),
         FLOAT_CONST("Вещественная константа"),
         VARIABLE("Переменная"),
@@ -61,7 +61,7 @@ public final class Lexema {
 
         private final String _description;
 
-        possible_types(String description){
+        lexema_types(String description){
             _description = description;
         }
 
@@ -84,15 +84,15 @@ public final class Lexema {
      */
     private final int _id;
 
-    public possible_types get_type() {
+    public lexema_types get_type() {
         return _type;
     }
 
     /**
      * Тип лексемы.
-     * @see possible_types
+     * @see lexema_types
      */
-    private possible_types _type;
+    private lexema_types _type;
 
     public String get_char() {
         return _char;
@@ -105,36 +105,42 @@ public final class Lexema {
         determine_lexema_type();
     }
 
+    public Lexema(Lexema other){
+        _id = other._id;
+        _char = other._char;
+        _type = other._type;
+    }
+
     /**
      * Определение типа лексемы из описанных в possible_types.
-     * @see possible_types
+     * @see lexema_types
      */
     private void determine_lexema_type(){
         if (operators.contains(_char)){
-            _type = possible_types.OPERATOR;
+            _type = lexema_types.OPERATOR;
             return;
         }
         if (splitters.contains(_char)){
-            _type = possible_types.SPLITTER;
+            _type = lexema_types.SPLITTER;
             return;
         }
         if (bool_consts.contains(_char)){
-            _type = possible_types.BOOL_CONST;
+            _type = lexema_types.BOOL_CONST;
             return;
         }
         try{
             Integer.parseInt(_char);
-            _type = possible_types.INT_CONST;
+            _type = lexema_types.INT_CONST;
             return;
         }
         catch (Exception ignored){}
         try{
             Float.parseFloat(_char);
-            _type = possible_types.FLOAT_CONST;
+            _type = lexema_types.FLOAT_CONST;
             return;
         }
         catch (Exception ignored){}
-        _type = possible_types.VARIABLE;
+        _type = lexema_types.VARIABLE;
     }
 
     @Override

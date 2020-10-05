@@ -1,4 +1,4 @@
-package sample;
+package GUI;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -6,8 +6,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import objects.Lexema;
-import objects.Parcer;
+import objects.LexemaParcer.Lexema;
+import objects.LexemaParcer.Parcer;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class Controller implements Initializable {
         if (input_sting.length() == 0)
             return;
 
-        Parcer.ParcerOutput po = Parcer.parce_string(input_sting);
+        Parcer.ParcerOutput po = Parcer.parce_string(input_sting); // Вся магия
 
         List<RowLexemaTableName> rowLexemaTableNameList = new ArrayList<>();
         for(Lexema lexema : po.object_lexema_list){

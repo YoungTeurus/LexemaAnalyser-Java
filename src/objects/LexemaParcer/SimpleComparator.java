@@ -1,4 +1,4 @@
-package objects;
+package objects.LexemaParcer;
 
 import interfaces.IComparator;
 

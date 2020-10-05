@@ -1,4 +1,4 @@
-package sample;
+package GUI;
 
 public class RowHashTableName {
     public int getId() {

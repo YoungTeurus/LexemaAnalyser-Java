@@ -1,7 +1,8 @@
-package objects;
+package objects.Hashing;
 
 import interfaces.IComparator;
 import interfaces.IHashFunction;
+import objects.LexemaParcer.SimpleComparator;
 
 /**
  * Класс хеш-тиблицы, предназначенной для вставки и получения объектов с лучшей сложностью O(1).

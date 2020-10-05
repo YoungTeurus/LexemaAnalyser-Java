@@ -1,4 +1,4 @@
-package objects;
+package objects.Hashing;
 
 import interfaces.IHashFunction;
 

@@ -1,4 +1,4 @@
-package objects;
+package objects.LexemaParcer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
