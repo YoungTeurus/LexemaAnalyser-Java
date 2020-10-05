@@ -18,7 +18,7 @@ public class Parcer {
         }
     }
 
-    public static List<List<List<Lexema>>> get_lexema_levels(List<Lexema> output_lexema_list) {
+    public static List<List<List<Lexema>>> get_lexema_levels(List<Lexema> output_lexema_list) throws SyntaxParcerException {
         // Пытаемся понять поряд операций в строке
         // Каждой лексеме присваивается level её вложенности. После с помощью них будет создаваться дерево.
         // Удаляет все сплиттеры! (В данной реализации.)
@@ -36,10 +36,13 @@ public class Parcer {
         levels.add(new ArrayList<>());
 
         int current_level = 0; // Текущий уровень вложенности.
+        //TODO: временно:
+        int equals_added = 0;  // Количество добавленных знаков равно
 
         List<Lexema> level = levels.get(current_level);
 
 
+        //TODO: как-то вынести хардкод
         for (Lexema lex: output_lexema_list) {
             if (lex.get_type() == Lexema.lexema_types.OPERATOR){
                 if (lex.get_char().equals("=")){
@@ -47,6 +50,7 @@ public class Parcer {
                     List<Lexema> new_upper_level = new ArrayList<>();
                     new_upper_level.add(lex);
                     levels.add(current_level, new_upper_level);
+                    equals_added += 1;
                     current_level += 1;
                     level = levels.get(current_level);
                 }
@@ -73,7 +77,17 @@ public class Parcer {
                         break;
                     case ";":
                         // Сбрасываем уровень, если встретили ";"
-                        // TODO: придумать, что делать
+
+                        // Проверка на правильное количество открывающих и закрывающих скобок:
+                        if (current_level != equals_added){
+                            // Если к концу выражения мы не находимся на стандартном уровне - что-то не так с вложенностью
+                            throw new SyntaxParcerException(
+                                    String.format(
+                                            "Уровень вложенности нарушен: имеем %d, ожидался %d",
+                                            current_level, equals_added
+                                    )
+                            );
+                        }
 
                         current_expression += 1;
                         // Добавляем новое выражение...
@@ -82,6 +96,7 @@ public class Parcer {
                         levels = expressions.get(current_expression);
                         levels.add(new ArrayList<>());
                         current_level = 0;
+                        equals_added = 0;
                         // Переводим указатели на правильные уровни
                         level = levels.get(current_level);
                         break;
@@ -89,16 +104,18 @@ public class Parcer {
             }
         }
 
-        // Удаление всех сплиттеров (в текущей реализации).
-        output_lexema_list.removeIf(lexema -> lexema.get_type() == Lexema.lexema_types.SPLITTER);
+        // TODO: подумать, как убирать сплиттеры из дерева разбора
 
-        // TODO: Вынести всю логику в другой класс(-ы), чтобы уйти от статических правил для оразличных лексем.
+        // Удаление всех сплиттеров (в текущей реализации).
+        // output_lexema_list.removeIf(lexema -> lexema.get_type() == Lexema.lexema_types.SPLITTER);
+
+        // TODO: Вынести всю логику в другой класс(-ы), чтобы уйти от статических правил для различных лексем.
         // for (rule in Rules): if rule.type == lex.type: rule.do_stuff(current_node, lex)
 
         return expressions;
     }
 
-    public static List<TreeNode> get_tree(List<Lexema> output_lexema_list, List<List<List<Lexema>>> expressions){
+    public static List<TreeNode> get_tree(List<Lexema> output_lexema_list, List<List<List<Lexema>>> expressions) throws SyntaxParcerException {
         // Строим дерево с помощью списка уровня лексем
 
         // Копия исходного листа, в котором будем хранить лексемы и TreeNode-ы
@@ -113,9 +130,18 @@ public class Parcer {
                     // Пусть все операции пока что унарные.
                     int lex_i = output_lexema_list_copy.indexOf(lex); // Порядковый номер лексемы
                     TreeNode tree = new TreeNode().setContent(lex);
+
+                    // Ошибка может произойти здесь, если какого-нибудь элемента не будет слева или справа
+                    // При этом для разных операторов, например, not отсутствие левого элемента не будет ошибкой.
+
                     // Заполнение дерева:
-                    tree.setLeft(output_lexema_list_copy.get(lex_i - 1));
-                    tree.setRight(output_lexema_list_copy.get(lex_i + 1));
+                    try {
+                        tree.setLeft(output_lexema_list_copy.get(lex_i - 1));
+                        tree.setRight(output_lexema_list_copy.get(lex_i + 1));
+                    }
+                    catch (IndexOutOfBoundsException e){
+                        throw new SyntaxParcerException("Найдена ошибка при разборе!");
+                    }
 
                     // Удаление использованных лексем:
                     output_lexema_list_copy.add(lex_i, tree);  // Добавляю Treenode на место опреатора

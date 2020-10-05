@@ -5,7 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import objects.LexemaParcer.Lexema;
 import objects.LexemaParcer.Parcer;
-import objects.SyntaxParcer.SyntaxRule;
+import objects.SyntaxParcer.SyntaxParcerException;
 import objects.SyntaxParcer.TreeNode;
 
 import java.util.List;
@@ -24,13 +24,17 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         // launch(args);
-        String str = "a = (b + c) * a";
+        String str = "a = (b + c) * 5; x = abc + 3;";
         Parcer.ParcerOutput po = Parcer.parce_string(str);
         System.out.println(po);
 
         List<List<List<Lexema>>> expressions = objects.SyntaxParcer.Parcer.get_lexema_levels(po.output_lexema_list);
 
-        List<TreeNode> treeNodes = objects.SyntaxParcer.Parcer.get_tree(po.output_lexema_list, expressions);
+        List<TreeNode> treeNodes;
+        try {
+            treeNodes = objects.SyntaxParcer.Parcer.get_tree(po.output_lexema_list, expressions);
+            System.out.println(treeNodes);
+        } catch (SyntaxParcerException ignored) {}
         // System.out.println(levels.toString());
     }
 }
