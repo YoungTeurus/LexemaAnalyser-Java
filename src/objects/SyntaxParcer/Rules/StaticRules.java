@@ -56,21 +56,31 @@ public class StaticRules {
     // Справа от знака равно - любой TreeNode.
     public static final IRule ruleForEqualSignRightNeighbour = new TrueRule();
 
-    private static final LeftRightRulesCombo leftRightRulesCombo_ForEqualSgin =
+    private static final LeftRightRulesCombo leftRightRulesCombo_ForEqualSign =
             new LeftRightRulesCombo(ruleForEqualSignLeftNeighbour,
             ruleForEqualSignRightNeighbour);
 
     // Для стандартного оператора слева и справа может быть что угодно, кроме знака равно.
     public static final IRule ruleForDefaultOperatorNeighbour = ruleForNotEqualChar;
 
+    // Пара правил для стандартных операторов
+    public static final LeftRightRulesCombo leftRightRulesCombo_ForDefaultOperator =
+            new LeftRightRulesCombo(ruleForDefaultOperatorNeighbour, ruleForEqualSignRightNeighbour);
+
     // Словарь типа "строковое_представление, правила_для_левого_и_правого_соседа".
     public static final Map<String, LeftRightRulesCombo> stringLeftRightRulesComboMap = new HashMap<>();
     static {
-        stringLeftRightRulesComboMap.put("=", leftRightRulesCombo_ForEqualSgin);
-        stringLeftRightRulesComboMap.put(":=", leftRightRulesCombo_ForEqualSgin);
+        stringLeftRightRulesComboMap.put("=", leftRightRulesCombo_ForEqualSign);
+        stringLeftRightRulesComboMap.put(":=", leftRightRulesCombo_ForEqualSign);
         stringLeftRightRulesComboMap.put("+",leftRightRulesCombo_ForArithmetic);
         stringLeftRightRulesComboMap.put("-",leftRightRulesCombo_ForArithmetic);
         stringLeftRightRulesComboMap.put("*",leftRightRulesCombo_ForArithmetic);
         stringLeftRightRulesComboMap.put("/",leftRightRulesCombo_ForArithmetic);
+    }
+
+    // Словарь типа "строковое_представление, использует_ли_данный_оператор_левый_элемент"
+    public static final Map<String, Boolean> doesLexemaUsesLeftNeighbour = new HashMap<>();
+    static {
+        doesLexemaUsesLeftNeighbour.put("not", false);
     }
 }

@@ -1,54 +1,63 @@
 package objects.SyntaxParcer;
 
 import objects.LexemaParcer.Lexema;
+import objects.SyntaxParcer.Rules.LeftRightRulesCombo;
+import objects.SyntaxParcer.Rules.StaticRules;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import static objects.SyntaxParcer.Rules.StaticRules.leftRightRulesCombo_ForDefaultOperator;
 
 public class Parcer {
 
-    private static class SyntaxLexema{
-        public Lexema _lexema;
-        public int _pos;
-
-        SyntaxLexema(Lexema lexema, int pos){
-            _lexema = lexema;
-            _pos = pos;
-        }
+    public static class ParcerOutput{
+        public List<TreeNode> output_treenode_lexema_list;
+        public List<List<List<TreeNode>>> expressions;
     }
 
-    public static List<List<List<Lexema>>> get_lexema_levels(List<Lexema> output_lexema_list) throws SyntaxParcerException {
+    public static ParcerOutput get_lexema_levels(List<Lexema> output_lexema_list) throws SyntaxParcerException {
+
         // Пытаемся понять поряд операций в строке
         // Каждой лексеме присваивается level её вложенности. После с помощью них будет создаваться дерево.
         // Удаляет все сплиттеры! (В данной реализации.)
 
+        ParcerOutput po = new ParcerOutput();
+
+        // Заменяем все Lexema на TreeNode для облегчения работы в следующем методе.
+        List<TreeNode> output_treenode_lexema_list = new ArrayList<>();
+        for (Lexema lex : output_lexema_list){
+            output_treenode_lexema_list.add(new TreeNode().setContent(lex));
+        }
+
         // Expression - отдельные выражения (разделённые ;)
         // |_ Levels - уровни внутри одного выражения
         //    |_ Level - уровень
-        //       |_ Lexema - лексема
-        List<List<List<Lexema>>> expressions = new ArrayList<>();
+        //       |_ TreeNode - дерево-лист
+        //          |_.getContent() -> Lexema - лексема
+        List<List<List<TreeNode>>> expressions = new ArrayList<>();
         expressions.add(new ArrayList<>());
 
         int current_expression = 0; // Текущее выражение
 
-        List<List<Lexema>> levels = expressions.get(current_expression);
+        List<List<TreeNode>> levels = expressions.get(current_expression);
         levels.add(new ArrayList<>());
 
         int current_level = 0; // Текущий уровень вложенности.
         //TODO: временно:
         int equals_added = 0;  // Количество добавленных знаков равно
 
-        List<Lexema> level = levels.get(current_level);
+        List<TreeNode> level = levels.get(current_level);
 
 
         //TODO: как-то вынести хардкод
-        for (Lexema lex: output_lexema_list) {
+        for (TreeNode node: output_treenode_lexema_list) {
+            Lexema lex = (Lexema)node.getContent();
             if (lex.get_type() == Lexema.lexema_types.OPERATOR){
                 if (lex.get_char().equals("=")){
                     // Особый случай "=" - создаём новый уровень, который выше текущего
-                    List<Lexema> new_upper_level = new ArrayList<>();
-                    new_upper_level.add(lex);
+                    List<TreeNode> new_upper_level = new ArrayList<>();
+                    new_upper_level.add(node);
                     levels.add(current_level, new_upper_level);
                     equals_added += 1;
                     current_level += 1;
@@ -56,7 +65,7 @@ public class Parcer {
                 }
                 else {
                     // Каждый оператор заносим на текущий уровень
-                    level.add(lex);
+                    level.add(node);
                 }
             }
             else if (lex.get_type() == Lexema.lexema_types.SPLITTER){
@@ -107,51 +116,96 @@ public class Parcer {
         // TODO: подумать, как убирать сплиттеры из дерева разбора
 
         // Удаление всех сплиттеров (в текущей реализации).
-        // output_lexema_list.removeIf(lexema -> lexema.get_type() == Lexema.lexema_types.SPLITTER);
+        output_treenode_lexema_list.removeIf(treeNode -> treeNode.getContent().get_type() == Lexema.lexema_types.SPLITTER);
 
         // TODO: Вынести всю логику в другой класс(-ы), чтобы уйти от статических правил для различных лексем.
         // for (rule in Rules): if rule.type == lex.type: rule.do_stuff(current_node, lex)
 
-        return expressions;
+        po.output_treenode_lexema_list = output_treenode_lexema_list;
+        po.expressions = expressions;
+
+        return po;
     }
 
-    public static List<TreeNode> get_tree(List<Lexema> output_lexema_list, List<List<List<Lexema>>> expressions) throws SyntaxParcerException {
+    public static List<TreeNode> get_tree(List<TreeNode> output_treenode_lexema_list,
+                                          List<List<List<TreeNode>>> expressions,
+                                          List<Lexema> output_lexema_list) throws SyntaxParcerException {
         // Строим дерево с помощью списка уровня лексем
 
         // Копия исходного листа, в котором будем хранить лексемы и TreeNode-ы
         List<TreeNode> expressions_trees = new ArrayList<>(); // Список, содержащий все TreeNode отдельных команд
-        List<Object> output_lexema_list_copy = new ArrayList<>(output_lexema_list);
         for (int current_expression = 0; current_expression < expressions.size(); current_expression++){
             // Разбираем по одному выражению
-            List<List<Lexema>> levels = expressions.get(current_expression);
+            List<List<TreeNode>> levels = expressions.get(current_expression);
             for (int current_level = levels.size() - 1; current_level >= 0; current_level--){
                 // Начинаем с самого глубокого (большого по числу) уровня
-                for(Lexema lex : levels.get(current_level)){
+                for(TreeNode node : levels.get(current_level)){
                     // Пусть все операции пока что унарные.
-                    int lex_i = output_lexema_list_copy.indexOf(lex); // Порядковый номер лексемы
-                    TreeNode tree = new TreeNode().setContent(lex);
+                    int node_i = output_treenode_lexema_list.indexOf(node); // Порядковый номер node
 
-                    // Ошибка может произойти здесь, если какого-нибудь элемента не будет слева или справа
-                    // При этом для разных операторов, например, not отсутствие левого элемента не будет ошибкой.
+                    // Использует ли оператор элемент слева
+                    Boolean use_left_neighbour = StaticRules.doesLexemaUsesLeftNeighbour.getOrDefault(
+                            node.getContent().get_char(), true);
 
-                    // Заполнение дерева:
+                    // Элементы возле оператора
+                    TreeNode left_neighbour = null;
+                    TreeNode right_neighbour = null;
+
+                    if (use_left_neighbour){
+                        // Пытаемся взять элемент слева:
+                        try {
+                            left_neighbour = output_treenode_lexema_list.get(node_i - 1);
+                        }
+                        catch (IndexOutOfBoundsException e){
+                            throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Невозможно найти левый " +
+                                    "элемент для оператора %s на позиции %d.", node.getContent().get_char(),
+                                    output_lexema_list.indexOf(node.getContent())
+                            )
+                            );
+                        }
+                    }
+                    // Пытаемся взять элемент справа:
                     try {
-                        tree.setLeft(output_lexema_list_copy.get(lex_i - 1));
-                        tree.setRight(output_lexema_list_copy.get(lex_i + 1));
+                        right_neighbour = output_treenode_lexema_list.get(node_i + 1);
                     }
                     catch (IndexOutOfBoundsException e){
-                        throw new SyntaxParcerException("Найдена ошибка при разборе!");
+                        throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Невозможно найти правый " +
+                                "элемент для оператора %s на позиции %d.", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent()) ));
+                    }
+
+                    // Пытаемся найти правило для текущего оператора:
+                    LeftRightRulesCombo rulesCombo =  StaticRules.stringLeftRightRulesComboMap.getOrDefault(
+                            node.getContent().get_char(),
+                            leftRightRulesCombo_ForDefaultOperator
+                    );
+
+                    if (use_left_neighbour){
+                        if (rulesCombo.leftRule.check(left_neighbour)){
+                            node.setLeft(left_neighbour);
+                        }
+                        else{
+                            throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Левый элемент для оператора " +
+                                    "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent()) ));
+                        }
+                    }
+
+                    if (rulesCombo.rightRule.check(right_neighbour)){
+                        node.setRight(right_neighbour);
+                    }
+                    else{
+                        throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Правый элемент для оператора " +
+                                "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent()) ));
                     }
 
                     // Удаление использованных лексем:
-                    output_lexema_list_copy.add(lex_i, tree);  // Добавляю Treenode на место опреатора
-                    output_lexema_list_copy.remove(tree.getContent());  // Удаляю оператор
-                    output_lexema_list_copy.remove(tree.getLeft());  // Удаляю левый член
-                    output_lexema_list_copy.remove(tree.getRight());  // Удаляю правый член
+                    if (use_left_neighbour){
+                        output_treenode_lexema_list.remove(left_neighbour);
+                    }
+                    output_treenode_lexema_list.remove(right_neighbour);
 
                     if (current_level == 0){
                         // Если дошли до верхнего уровня, добавляем текущее дерево на вывод
-                        expressions_trees.add(tree);
+                        expressions_trees.add(node);
                     }
                 }
             }

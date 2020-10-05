@@ -24,17 +24,19 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         // launch(args);
-        String str = "a = (b + c) * 5; x = abc + 3;";
-        Parcer.ParcerOutput po = Parcer.parce_string(str);
-        System.out.println(po);
+        String str = "a = (b + c) * 5 + d; x = abc + 3; a = not b;";
+        Parcer.ParcerOutput lpo = Parcer.parce_string(str);
+        System.out.println(lpo);
 
-        List<List<List<Lexema>>> expressions = objects.SyntaxParcer.Parcer.get_lexema_levels(po.output_lexema_list);
-
-        List<TreeNode> treeNodes;
         try {
-            treeNodes = objects.SyntaxParcer.Parcer.get_tree(po.output_lexema_list, expressions);
+            objects.SyntaxParcer.Parcer.ParcerOutput spo = objects.SyntaxParcer.Parcer.get_lexema_levels(lpo.output_lexema_list);
+
+            List<TreeNode> treeNodes;
+            treeNodes = objects.SyntaxParcer.Parcer.get_tree(spo.output_treenode_lexema_list, spo.expressions, lpo.output_lexema_list);
             System.out.println(treeNodes);
-        } catch (SyntaxParcerException ignored) {}
-        // System.out.println(levels.toString());
+
+        } catch (SyntaxParcerException e) {
+            e.printStackTrace();
+        }
     }
 }
