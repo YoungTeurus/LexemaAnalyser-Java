@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import objects.LexemaParcer.Lexema;
 import objects.LexemaParcer.Parcer;
+import objects.SyntaxParcer.SyntaxParcerException;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,25 +30,25 @@ public class Controller implements Initializable {
     private TextArea textfield_output;
 
     @FXML
+    private TextArea textfield_log;
+
+    @FXML
     private TableView<RowHashTableName> table_hashtable;
 
-    // private class EventHandlerParse implements EventHandler<MouseEvent>{
-    //     @Override
-    //     public void handle(MouseEvent event) {
-    //         textfield_input
-    //     }
-    // }
-
     private void parce_input_string(MouseEvent event){
+        textfield_log.clear();
+
         String input_sting = textfield_input.getText();
 
         if (input_sting.length() == 0)
             return;
 
-        Parcer.ParcerOutput po = Parcer.parce_string(input_sting); // Вся магия
+        Parcer.ParcerOutput lpo = Parcer.parce_string(input_sting); // Вся магия
+
+        textfield_log.appendText("Лексический анализ прошёл успешно!\n");
 
         List<RowLexemaTableName> rowLexemaTableNameList = new ArrayList<>();
-        for(Lexema lexema : po.object_lexema_list){
+        for(Lexema lexema : lpo.object_lexema_list){
             rowLexemaTableNameList.add(
                     new RowLexemaTableName(
                         lexema.get_id(),
@@ -58,7 +59,7 @@ public class Controller implements Initializable {
         }
 
         StringBuilder output_lexema_string = new StringBuilder();
-        for (Lexema lexema : po.output_lexema_list){
+        for (Lexema lexema : lpo.output_lexema_list){
             output_lexema_string.append(lexema.toString());
             output_lexema_string.append(" ");
         }
@@ -67,7 +68,7 @@ public class Controller implements Initializable {
 
         List<RowHashTableName> rowHashTableNameList = new ArrayList<>();
         int i = 0;
-        for(Object object : po.hashTable.get_table()){
+        for(Object object : lpo.hashTable.get_table()){
             if (object != null){
                 rowHashTableNameList.add(
                         new RowHashTableName(
@@ -87,6 +88,17 @@ public class Controller implements Initializable {
 
         table_hashtable.setItems(FXCollections.observableList(rowHashTableNameList));
 
+        // Синтаксический анализ:
+        try {
+            objects.SyntaxParcer.Parcer.ParcerOutput spo = objects.SyntaxParcer.Parcer.get_lexema_levels(lpo.output_lexema_list);
+            spo.expressions_trees = objects.SyntaxParcer.Parcer.get_tree(spo.output_treenode_lexema_list, spo.expressions, lpo.output_lexema_list);
+            textfield_log.appendText("Синтаксический анализ прошёл успешно!\n");
+        }
+        catch (SyntaxParcerException e){
+            textfield_log.appendText(e.toString() + "\n");
+        }
+
+
     }
 
 
@@ -95,19 +107,19 @@ public class Controller implements Initializable {
         // Функция при инициализации.
 
         TableColumn<RowLexemaTableName, String> tc_lexemaId =
-                new TableColumn<RowLexemaTableName, String>("ID лексемы");
+                new TableColumn<>("ID лексемы");
         tc_lexemaId.setSortable(false);
         tc_lexemaId.setCellValueFactory(cellData ->
                 new SimpleStringProperty(String.valueOf(cellData.getValue().getId()))
         );
         TableColumn<RowLexemaTableName, String> tc_lexemachar =
-                new TableColumn<RowLexemaTableName, String>("Строковое представление");
+                new TableColumn<>("Строковое представление");
         tc_lexemachar.setSortable(false);
         tc_lexemachar.setCellValueFactory(cellData ->
                 new SimpleStringProperty(String.valueOf(cellData.getValue().getString_reprecentation()))
         );
         TableColumn<RowLexemaTableName, String> tc_lexematype =
-                new TableColumn<RowLexemaTableName, String>("Тип лексемы");
+                new TableColumn<>("Тип лексемы");
         tc_lexematype.setSortable(false);
         tc_lexematype.setCellValueFactory(cellData ->
                 new SimpleStringProperty(String.valueOf(cellData.getValue().getLexema_type()))

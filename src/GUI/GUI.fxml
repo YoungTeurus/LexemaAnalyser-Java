@@ -42,8 +42,9 @@
                                   <RowConstraints maxHeight="163.0" minHeight="0.0" prefHeight="33.0" vgrow="NEVER" />
                                   <RowConstraints maxHeight="405.0" minHeight="10.0" prefHeight="157.0" vgrow="SOMETIMES" />
                                   <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="40.0" vgrow="NEVER" />
-                                    <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="32.0" vgrow="NEVER" />
-                                    <RowConstraints maxHeight="513.0" minHeight="10.0" prefHeight="269.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="71.0" vgrow="NEVER" />
+                                    <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="35.0" vgrow="NEVER" />
+                                    <RowConstraints maxHeight="513.0" minHeight="10.0" prefHeight="203.0" vgrow="SOMETIMES" />
                                     <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="45.0" vgrow="NEVER" />
                                     <RowConstraints maxHeight="453.0" minHeight="10.0" prefHeight="144.0" vgrow="ALWAYS" />
                                 </rowConstraints>
@@ -53,20 +54,21 @@
                                           <Font size="20.0" />
                                        </font>
                                     </Label>
-                                    <TextArea fx:id="textfield_input" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+                                    <TextArea fx:id="textfield_input" prefHeight="200.0" prefWidth="200.0" promptText="Введите исходный текст сюда, разделяя команды &quot;;&quot;" GridPane.rowIndex="1" />
                                     <Button fx:id="button_parse" mnemonicParsing="false" prefHeight="31.0" prefWidth="400.0" text="Разобрать" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-                                    <Label text="Таблица лексем" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                                    <Label text="Таблица лексем" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                                        <font>
                                           <Font size="20.0" />
                                        </font>
                                     </Label>
-                                    <TableView fx:id="table_lexemas" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="4" />
-                                    <Label text="Последовательность лексем" GridPane.halignment="CENTER" GridPane.rowIndex="5">
+                                    <TableView fx:id="table_lexemas" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="5" />
+                                    <Label text="Последовательность лексем" GridPane.halignment="CENTER" GridPane.rowIndex="6">
                                        <font>
                                           <Font size="20.0" />
                                        </font>
                                     </Label>
-                                    <TextArea fx:id="textfield_output" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="6" />
+                                    <TextArea fx:id="textfield_output" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="7" />
+                                    <TextArea fx:id="textfield_log" editable="false" prefHeight="200.0" prefWidth="200.0" promptText="Лог разбора" GridPane.rowIndex="3" />
                                  </children>
                               </GridPane>
                            </children>

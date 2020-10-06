@@ -12,8 +12,9 @@ import static objects.SyntaxParcer.Rules.StaticRules.leftRightRulesCombo_ForDefa
 public class Parcer {
 
     public static class ParcerOutput{
-        public List<TreeNode> output_treenode_lexema_list;
-        public List<List<List<TreeNode>>> expressions;
+        public List<TreeNode> output_treenode_lexema_list;  // Список исходных лексем в виде TreeNode
+        public List<List<List<TreeNode>>> expressions;  // Список выражений (состоящих из уровней)
+        public List<TreeNode> expressions_trees;  // Список деревеьев для каждого из выражений
     }
 
     public static ParcerOutput get_lexema_levels(List<Lexema> output_lexema_list) throws SyntaxParcerException {
@@ -52,7 +53,7 @@ public class Parcer {
 
         //TODO: как-то вынести хардкод
         for (TreeNode node: output_treenode_lexema_list) {
-            Lexema lex = (Lexema)node.getContent();
+            Lexema lex = node.getContent();
             if (lex.get_type() == Lexema.lexema_types.OPERATOR){
                 if (lex.get_char().equals("=")){
                     // Особый случай "=" - создаём новый уровень, который выше текущего
@@ -113,13 +114,8 @@ public class Parcer {
             }
         }
 
-        // TODO: подумать, как убирать сплиттеры из дерева разбора
-
         // Удаление всех сплиттеров (в текущей реализации).
         output_treenode_lexema_list.removeIf(treeNode -> treeNode.getContent().get_type() == Lexema.lexema_types.SPLITTER);
-
-        // TODO: Вынести всю логику в другой класс(-ы), чтобы уйти от статических правил для различных лексем.
-        // for (rule in Rules): if rule.type == lex.type: rule.do_stuff(current_node, lex)
 
         po.output_treenode_lexema_list = output_treenode_lexema_list;
         po.expressions = expressions;
@@ -149,7 +145,7 @@ public class Parcer {
 
                     // Элементы возле оператора
                     TreeNode left_neighbour = null;
-                    TreeNode right_neighbour = null;
+                    TreeNode right_neighbour;
 
                     if (use_left_neighbour){
                         // Пытаемся взять элемент слева:
@@ -210,6 +206,8 @@ public class Parcer {
                 }
             }
         }
+
+        //TODO: сделать проверку на наличие деревьев, НЕ входящих в конечное выражение, что является ошибкой.
 
         // expression_trees содержит список деревьев разбора для каждого из выражений
         return expressions_trees;

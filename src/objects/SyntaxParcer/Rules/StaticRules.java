@@ -11,6 +11,8 @@ public class StaticRules {
     public static final IRule ruleForEqualChar = new CharRule("=");
     public static final IRule ruleForNotEqualChar = new NOTRule(ruleForEqualChar);
 
+    public static final IRule ruleForNotLeaf = new NOTRule(new LeafRule());
+
     // Любая константа: целочисленная/вещественная/булева
     public static final IRule ruleForAnyConst = new ORRule(
             new ORRule(
@@ -41,12 +43,11 @@ public class StaticRules {
     // Правила для конкретных проверок:
 
     // Проверка для соседних элементов арифметических знаков.
-    // Верными соседями считаются: данные (константы, переменные), арифм. операции, булевы операции
-    // public static final IRule ruleForArithmeticNeighbour = new ORRule(
-    //         ruleForData,
-    //         new ORRule(ruleForArithmeticSign, ruleForBoolOperator)
-    // );
-    public static final IRule ruleForArithmeticNeighbour = ruleForNotEqualChar;
+    // Верными соседями считаются: данные (константы, переменные) ИЛИ арифм. операции, булевы операции, не являющиеся листами
+    public static final IRule ruleForArithmeticNeighbour = new ORRule(
+            ruleForData,
+            new ANDRule(new ORRule(ruleForArithmeticSign, ruleForBoolOperator), ruleForNotLeaf)
+    );
 
     private static final LeftRightRulesCombo leftRightRulesCombo_ForArithmetic =
             new LeftRightRulesCombo(ruleForArithmeticNeighbour, ruleForArithmeticNeighbour);
