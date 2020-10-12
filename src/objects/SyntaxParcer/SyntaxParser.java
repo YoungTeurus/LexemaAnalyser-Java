@@ -3,6 +3,7 @@ package objects.SyntaxParcer;
 import objects.LexemaParcer.Lexema;
 import objects.SyntaxParcer.Rules.LeftRightRulesCombo;
 import objects.SyntaxParcer.Rules.StaticRules;
+import objects.SyntaxParcer.SyntaxParts.TreeNode;
 
 import java.util.ArrayList;
 import java.util.List;

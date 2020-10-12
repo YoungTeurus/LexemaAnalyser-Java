@@ -1,7 +1,7 @@
 package objects.SyntaxParcer.Rules;
 
 import objects.LexemaParcer.Lexema;
-import objects.SyntaxParcer.TreeNode;
+import objects.SyntaxParcer.SyntaxParts.TreeNode;
 
 /**
  * Правило для проверки вершины TreeNode на содержание определённого типа лексемы.

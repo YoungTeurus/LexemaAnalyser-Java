@@ -1,6 +1,6 @@
 package objects.SyntaxParcer.Rules;
 
-import objects.SyntaxParcer.TreeNode;
+import objects.SyntaxParcer.SyntaxParts.TreeNode;
 
 /**
  * Правило для проверки: явлется ли TreeNode листом (то есть, есть ли у него в left и в right что либо).

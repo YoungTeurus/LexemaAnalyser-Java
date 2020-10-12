@@ -1,4 +1,4 @@
-package objects.SyntaxParcer;
+package objects.SyntaxParcer.SyntaxParts;
 
 import objects.LexemaParcer.Lexema;
 
@@ -36,7 +36,7 @@ public class TreeNode {
     private Lexema content;
 
 
-    TreeNode(){
+    public TreeNode(){
         left = null;
         right = null;
         content = null;

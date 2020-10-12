@@ -38,6 +38,7 @@ public final class Lexema {
 
     // Указанные ниже лексемы являются операторами в исходном языке
     public static final List<String> operators = Arrays.asList(
+            "if", "else",
             "not", "xor", "or", "and", "=", ":=",
             "^", "+", "-", "*", "/", "==", "<", ">" 
     );

@@ -1,6 +1,6 @@
 package objects.SyntaxParcer.Rules;
 
-import objects.SyntaxParcer.TreeNode;
+import objects.SyntaxParcer.SyntaxParts.TreeNode;
 
 /**
  * Правило для логической операции "И" между двумя правилами.
