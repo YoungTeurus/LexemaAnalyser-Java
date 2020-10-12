@@ -58,7 +58,8 @@ public final class Lexema {
         VARIABLE("Переменная"),
         OPERATOR("Оператор"),
         SPLITTER("Разделитель"),
-        BOOL_CONST("Булева константа");
+        BOOL_CONST("Булева константа"),
+        BLOCK_POINTER("Указатель на блок кода");
 
         private final String _description;
 
@@ -71,52 +72,68 @@ public final class Lexema {
         }
     }
 
+
+
+    // Собственно описание класса:
+
+
     /**
      * Строковое представление лексемы.
      */
-    private final String _char;
-
-    public int get_id() {
-        return _id;
-    }
+    private final       String          _char;
 
     /**
      * ID-лексемы - уникальный идентификатор.
      */
-    private final int _id;
-
-    public lexema_types get_type() {
-        return _type;
-    }
+    private final       int             _id;
 
     /**
      * Тип лексемы.
      * @see lexema_types
      */
-    private lexema_types _type;
+    private             lexema_types    _type;
 
-    public String get_char() {
-        return _char;
-    }
+    /**
+     * Значение лексемы
+     */
+    public              Object          _value;
 
-    public Lexema(String _char, int _id){
+    // Конструкторы:
+    public              Lexema(String _char, int _id){
         this._char = _char;
         this._id = _id;
 
         determine_lexema_type();
     }
 
-    public Lexema(Lexema other){
+    public              Lexema(String _char, int _id, lexema_types _type){
+        this._char = _char;
+        this._id = _id;
+        this._type = _type;
+    }
+
+    public              Lexema(Lexema other){
         _id = other._id;
         _char = other._char;
         _type = other._type;
+    }
+
+    // Get-теры.
+    public              int             get_id() {
+        return _id;
+    }
+    public              lexema_types    get_type() {
+        return _type;
+    }
+    public              String          get_char() {
+        return _char;
     }
 
     /**
      * Определение типа лексемы из описанных в possible_types.
      * @see lexema_types
      */
-    private void determine_lexema_type(){
+    private             void            determine_lexema_type(){
         if (operators.contains(_char)){
             _type = lexema_types.OPERATOR;
             return;
@@ -145,7 +162,7 @@ public final class Lexema {
     }
 
     @Override
-    public String toString() {
+    public              String          toString() {
         switch (_type){
             case INT_CONST:
             case BOOL_CONST:
@@ -156,6 +173,8 @@ public final class Lexema {
             case OPERATOR:
             case SPLITTER:
                 return _char;
+            case BLOCK_POINTER:
+                return "Указатель на блок " + _char;
         }
         return "Нераспознанная лексема " + _id;
     }
