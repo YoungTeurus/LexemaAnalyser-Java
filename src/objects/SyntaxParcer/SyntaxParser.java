@@ -9,21 +9,21 @@ import java.util.List;
 
 import static objects.SyntaxParcer.Rules.StaticRules.leftRightRulesCombo_ForDefaultOperator;
 
-public class Parcer {
+public class SyntaxParser {
 
-    public static class ParcerOutput{
+    public static class SyntaxParserOutput {
         public List<TreeNode> output_treenode_lexema_list;  // Список исходных лексем в виде TreeNode
         public List<List<List<TreeNode>>> expressions;  // Список выражений (состоящих из уровней)
         public List<TreeNode> expressions_trees;  // Список деревеьев для каждого из выражений
     }
 
-    public static ParcerOutput get_lexema_levels(List<Lexema> output_lexema_list) throws SyntaxParcerException {
+    public static SyntaxParserOutput get_lexema_levels(List<Lexema> output_lexema_list) throws SyntaxParcerException {
 
         // Пытаемся понять поряд операций в строке
         // Каждой лексеме присваивается level её вложенности. После с помощью них будет создаваться дерево.
         // Удаляет все сплиттеры! (В данной реализации.)
 
-        ParcerOutput po = new ParcerOutput();
+        SyntaxParserOutput po = new SyntaxParserOutput();
 
         // Заменяем все Lexema на TreeNode для облегчения работы в следующем методе.
         List<TreeNode> output_treenode_lexema_list = new ArrayList<>();

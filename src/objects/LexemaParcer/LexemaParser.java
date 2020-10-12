@@ -6,8 +6,8 @@ import objects.Hashing.UniversalHashFunction_ForString;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Parcer {
-    public static class ParcerOutput{
+public class LexemaParser {
+    public static class LexemaParserOutput {
         public List<Lexema> object_lexema_list;
         public HashTable hashTable;
         public List<Lexema> output_lexema_list;
@@ -98,8 +98,8 @@ public class Parcer {
      * @param unique_str_lexema_list Список уникальных строковых лексем
      * @return ParcerOutput с двумя заполненными полями: списком объектов-лексем и хеш-таблицей, содержащей объекты-лексемы.
      */
-    private static ParcerOutput get_object_lexema_list_and_str_object_lexema_hash_table(List<String> unique_str_lexema_list){
-        ParcerOutput parcerOutput = new ParcerOutput();
+    private static LexemaParserOutput get_object_lexema_list_and_str_object_lexema_hash_table(List<String> unique_str_lexema_list){
+        LexemaParserOutput lexemaParserOutput = new LexemaParserOutput();
 
         int hash_table_size = DEFAULT_HASH_TABLE_SIZE;
         UniversalHashFunction_ForString hash_function = new UniversalHashFunction_ForString(hash_table_size);
@@ -114,10 +114,10 @@ public class Parcer {
             i += 1;
         }
 
-        parcerOutput.object_lexema_list = object_lexema_list;
-        parcerOutput.hashTable = hashTable;
+        lexemaParserOutput.object_lexema_list = object_lexema_list;
+        lexemaParserOutput.hashTable = hashTable;
 
-        return parcerOutput;
+        return lexemaParserOutput;
     }
 
     /**
@@ -143,17 +143,17 @@ public class Parcer {
      * @return Объект, содержащий список всех лексем, хеш-таблицу типа "строковая лексема - объект-лексема"
      *  и список представления исходной строки в виде последовательности лексем.
      */
-    public static ParcerOutput parce_string(String input_string){
-        input_string = Parcer.prepare_string(input_string);  // 0. Убрать все переносы строк
+    public static LexemaParserOutput parce_string(String input_string){
+        input_string = LexemaParser.prepare_string(input_string);  // 0. Убрать все переносы строк
 
-        List<String> str_lexema_list = Parcer.get_lexemas(input_string); // 1. Найти последовательность строковых лексем
+        List<String> str_lexema_list = LexemaParser.get_lexemas(input_string); // 1. Найти последовательность строковых лексем
         List<String> unique_str_lexema_list = new ListUniqieer<String>().unique_list(str_lexema_list); // 2. Найти уникальные строковые лексемы
         // 3. Создаём список объектов-лексем
         // 4. Создаём хеш-таблицу объектов-лексем
-        ParcerOutput po = Parcer.get_object_lexema_list_and_str_object_lexema_hash_table(unique_str_lexema_list);
+        LexemaParserOutput po = LexemaParser.get_object_lexema_list_and_str_object_lexema_hash_table(unique_str_lexema_list);
 
         // 5. Получаем выходной список
-        po.output_lexema_list = Parcer.get_output_lexema_list(str_lexema_list, po.hashTable);
+        po.output_lexema_list = LexemaParser.get_output_lexema_list(str_lexema_list, po.hashTable);
 
         return po;
     }

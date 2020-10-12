@@ -7,7 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import objects.LexemaParcer.Lexema;
-import objects.LexemaParcer.Parcer;
+import objects.LexemaParcer.LexemaParser;
+import objects.SyntaxParcer.SyntaxParser;
 import objects.SyntaxParcer.SyntaxParcerException;
 
 import java.net.URL;
@@ -35,25 +36,44 @@ public class Controller implements Initializable {
     @FXML
     private TableView<RowHashTableName> table_hashtable;
 
-    private void parce_input_string(MouseEvent event){
+    /**
+     * Очищает окно логов.
+     */
+    private void clear_logs(){
         textfield_log.clear();
+    }
 
-        String input_sting = textfield_input.getText();
+    /**
+     * Добавляет строку в конец логов.
+     */
+    private void append_logs(String str){
+        textfield_log.appendText(str);
+    }
 
-        if (input_sting.length() == 0)
-            return;
+    /**
+     * Возвращает текст, записанный в поле для ввода исходного кода.
+     */
+    private String get_input_string(){
+        String input_string = textfield_input.getText();
+        if (input_string.length() == 0){
+            append_logs("Исходный код пуст!");
+            return null;
+        }
+        return input_string;
+    }
 
-        Parcer.ParcerOutput lpo = Parcer.parce_string(input_sting); // Вся магия
-
-        textfield_log.appendText("Лексический анализ прошёл успешно!\n");
-
+    /**
+     * Заполняет таблицы комплилятора и выходную строку.
+     * @param lpo Выход лексического анализатора.
+     */
+    private void fill_compile_tables(LexemaParser.LexemaParserOutput lpo){
         List<RowLexemaTableName> rowLexemaTableNameList = new ArrayList<>();
         for(Lexema lexema : lpo.object_lexema_list){
             rowLexemaTableNameList.add(
                     new RowLexemaTableName(
-                        lexema.get_id(),
-                        lexema.get_char(),
-                        lexema.get_type().get_description()
+                            lexema.get_id(),
+                            lexema.get_char(),
+                            lexema.get_type().get_description()
                     )
             );
         }
@@ -87,18 +107,51 @@ public class Controller implements Initializable {
         );
 
         table_hashtable.setItems(FXCollections.observableList(rowHashTableNameList));
+    }
 
-        // Синтаксический анализ:
+    /**
+     * Последовательно выполняет:
+     * 1) Получение исходного текста кода.
+     * 2) Лексический анализ кода.
+     * 3) Заполнение таблиц компилятора
+     * 4) Синтаксический анализ кода.
+     * TODO: 5) Вывод текста программы на ЯП Ассемблер
+     */
+    private void parce_input_code(){
+        // Очистка логов и таблиц компилятора:
+        clear_logs();
+
+        // 1) Получение исходного текста кода.
+        String input_string = get_input_string();
+        if (input_string == null)
+            return;
+        // 2) Лексический анализ кода.
+        // lpo - Lexema Parser Output
+        LexemaParser.LexemaParserOutput lpo = LexemaParser.parce_string(input_string);
+
+        // 3) Заполнение таблиц компилятора
+        fill_compile_tables(lpo);
+
+        // 4) Синтаксический анализ кода.
+        // spo - Syxtax Parser Output
+        SyntaxParser.SyntaxParserOutput spo;
         try {
-            objects.SyntaxParcer.Parcer.ParcerOutput spo = objects.SyntaxParcer.Parcer.get_lexema_levels(lpo.output_lexema_list);
-            spo.expressions_trees = objects.SyntaxParcer.Parcer.get_tree(spo.output_treenode_lexema_list, spo.expressions, lpo.output_lexema_list);
-            textfield_log.appendText("Синтаксический анализ прошёл успешно!\n");
+            spo = SyntaxParser.get_lexema_levels(lpo.output_lexema_list);
+            spo.expressions_trees = SyntaxParser.get_tree(spo.output_treenode_lexema_list, spo.expressions, lpo.output_lexema_list);
+            append_logs("Синтаксический анализ прошёл успешно!\n");
         }
         catch (SyntaxParcerException e){
-            textfield_log.appendText(e.toString() + "\n");
+            append_logs(e.toString() + "\n");
         }
 
+        // TODO: 5) Вывод текста программы на ЯП Ассемблер
+    }
 
+    /**
+     * Обработчик события для нажатия кнопки "Распарсить".
+     */
+    private void ButtonParse_Click(MouseEvent event){
+        parce_input_code();
     }
 
 
@@ -143,10 +196,6 @@ public class Controller implements Initializable {
 
         table_hashtable.getColumns().addAll(tc_hashId, tc_hashDescription);
 
-        button_parse.setOnMouseClicked(this::parce_input_string);
-
-        // button_parse.setOnMouseClicked(event -> {
-        //     textfield_input.setText("hello");
-        // });
+        button_parse.setOnMouseClicked(this::ButtonParse_Click);
     }
 }
