@@ -3,9 +3,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import objects.CodeGenerator.Generator;
 import objects.LexemaParcer.LexemaParser;
 import objects.SyntaxParcer.SyntaxParcerException;
 import objects.SyntaxParcer.SyntaxParser;
+import objects.SyntaxParcer.SyntaxParts.Block;
+
+import java.util.List;
 
 public class Main extends Application {
 
@@ -21,11 +25,14 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         // launch(args);
-        String input = "a=10; b=15; if (a>b) { c = a; } else { c=b;}";
+        String input = "a = x AND b AND 8 AND n; if (wr < 10) { dg = uy}";
         LexemaParser.LexemaParserOutput lpo = LexemaParser.parce_string(input);
         SyntaxParser.SyntaxParserOutput spo;
         try {
             spo = SyntaxParser.get_lexema_levels(lpo.output_lexema_list);
+            List<Block> blocks = SyntaxParser.get_tree(spo.blocks, lpo.output_lexema_list);
+            Generator.generate_code(blocks);
+            // System.out.println(spo);
         }
         catch (SyntaxParcerException ignored){
         }

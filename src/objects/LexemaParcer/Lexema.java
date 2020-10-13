@@ -8,9 +8,9 @@ public final class Lexema {
     // Указанные ниже лексемы разделяют строку на отдельные лексемы
     public static final List<String> splitters = Arrays.asList(
             "+", "-", "*", "/",
-            "=", "(", ")", "^",
+            "=", "(", ")",
             "<", ">", ",", ";",
-            "{", "}", ":=", " ",
+            "{", "}", ":=", " ", "!=",
             "==", "[", "]"
     );
 
@@ -39,8 +39,8 @@ public final class Lexema {
     // Указанные ниже лексемы являются операторами в исходном языке
     public static final List<String> operators = Arrays.asList(
             "if", "else",
-            "not", "xor", "or", "and", "=", ":=",
-            "^", "+", "-", "*", "/", "==", "<", ">" 
+            "NOT", "XOR", "OR", "AND", "=", ":=",
+            "+", "-", "*", "/", "==", "<", ">", "!="
     );
 
     // Указанные ниже лексемы являются булевыми константами в исходном языке
@@ -103,7 +103,7 @@ public final class Lexema {
         this._char = _char;
         this._id = _id;
 
-        determine_lexema_type();
+        determine_lexema_type_and_value();
     }
 
     public              Lexema(String _char, int _id, lexema_types _type){
@@ -116,6 +116,11 @@ public final class Lexema {
         _id = other._id;
         _char = other._char;
         _type = other._type;
+        _value = other._value;
+    }
+
+    public              Object          get_value(){
+        return _value;
     }
 
     // Get-теры.
@@ -133,32 +138,36 @@ public final class Lexema {
      * Определение типа лексемы из описанных в possible_types.
      * @see lexema_types
      */
-    private             void            determine_lexema_type(){
+    private             void determine_lexema_type_and_value(){
         if (operators.contains(_char)){
             _type = lexema_types.OPERATOR;
+            _value = _char;
             return;
         }
         if (splitters.contains(_char)){
             _type = lexema_types.SPLITTER;
+            _value = _char;
             return;
         }
         if (bool_consts.contains(_char)){
             _type = lexema_types.BOOL_CONST;
+            _value = _char.equals("true");
             return;
         }
         try{
-            Integer.parseInt(_char);
+            _value = Integer.parseInt(_char);
             _type = lexema_types.INT_CONST;
             return;
         }
         catch (Exception ignored){}
         try{
-            Float.parseFloat(_char);
+            _value = Float.parseFloat(_char);
             _type = lexema_types.FLOAT_CONST;
             return;
         }
         catch (Exception ignored){}
         _type = lexema_types.VARIABLE;
+        _value = "$VAR_" + _char;
     }
 
     @Override

@@ -42,14 +42,14 @@ public class TreeNode {
     /**
      * Является ли дерево листом.
      */
-    boolean is_leaf(){
+    public boolean is_leaf(){
         return left == null && right == null;
     }
 
     @Override
     public String toString(){
-        return ((left == null) ? "null" : left.toString() )+ " " +
-                content.toString() + " " +
-                ((right == null) ? "null" : right.toString());
+        return ((left != null) ? left.toString() + " " : "")+
+                content.toString() +
+                ((right != null) ? " "+ right.toString() : "");
     }
 }

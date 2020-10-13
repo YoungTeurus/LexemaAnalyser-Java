@@ -137,7 +137,7 @@ public class Controller implements Initializable {
         SyntaxParser.SyntaxParserOutput spo;
         try {
             spo = SyntaxParser.get_lexema_levels(lpo.output_lexema_list);
-            spo.expressions_trees = SyntaxParser.get_tree(spo.output_treenode_lexema_list, spo.expressions, lpo.output_lexema_list);
+            // spo.expressions_trees = SyntaxParser.get_tree(spo.output_treenode_lexema_list, spo.expressions, lpo.output_lexema_list);
             append_logs("Синтаксический анализ прошёл успешно!\n");
         }
         catch (SyntaxParcerException e){
