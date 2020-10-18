@@ -24,20 +24,31 @@ public class CodeExpression {
         args = new ArrayList<>();
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public CodeExpression setCommand(String command) {
         this.command = command;
         return this;
     }
+    public String getCommand(){
+        return command;
+    }
 
+    @SuppressWarnings("UnusedReturnValue")
     public CodeExpression addLabel(String label){
         labels.add(label);
         return this;
     }
+    public List<String> getLabels(){return labels;}
 
+    @SuppressWarnings("UnusedReturnValue")
     public CodeExpression addArg(String arg) {
         args.add(arg);
         return this;
     }
+    public void setArgs(List<String> args){
+        this.args = args;
+    }
+    public List<String> getArgs(){return args;}
 
     /**
      * Возвращает соответствующий команде код.
