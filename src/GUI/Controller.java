@@ -146,6 +146,7 @@ public class Controller implements Initializable {
 
             // 5) Вывод текста программы на ЯП Ассемблер
             String output_code = Generator.generate_code(spo.blocks).toCode();
+            textfield_outputCode.setText(output_code);
         }
         catch (SyntaxParcerException e){
             append_logs(e.toString() + "\n");

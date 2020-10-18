@@ -24,17 +24,17 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        // launch(args);
-        String input = "a = x AND b AND 8 AND n; if (wr < 10) { dg = uy}";
-        LexemaParser.LexemaParserOutput lpo = LexemaParser.parce_string(input);
-        SyntaxParser.SyntaxParserOutput spo;
-        try {
-            spo = SyntaxParser.get_lexema_levels(lpo.output_lexema_list);
-            List<Block> blocks = SyntaxParser.get_tree(spo, lpo.output_lexema_list);
-            Generator.generate_code(blocks);
-            // System.out.println(spo);
-        }
-        catch (SyntaxParcerException ignored){
-        }
+        launch(args);
+        // String input = "a = x AND b AND 8 AND n; if (wr < 10) { dg = uy}";
+        // LexemaParser.LexemaParserOutput lpo = LexemaParser.parce_string(input);
+        // SyntaxParser.SyntaxParserOutput spo;
+        // try {
+        //     spo = SyntaxParser.get_lexema_levels(lpo.output_lexema_list);
+        //     List<Block> blocks = SyntaxParser.get_tree(spo, lpo.output_lexema_list);
+        //     Generator.generate_code(blocks);
+        //     // System.out.println(spo);
+        // }
+        // catch (SyntaxParcerException ignored){
+        // }
     }
 }
