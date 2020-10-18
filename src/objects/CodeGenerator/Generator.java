@@ -58,6 +58,13 @@ import java.util.List;
 public class Generator {
     private static int last_id = 0;
 
+    /**
+     * Гененрирует код для одного TreeNode, гененрируя код для каждого TreeNode, входящего в него.
+     * Добавляет метки начала и конца блока.
+     * @param block Block, для которого генерируется код.
+     * @see Block
+     * @return CodeBlock, соответствующий коду для данного block.
+     */
     public static CodeBlock generate_code(Block block){
         // Генерирует код для одного блока.
         if (block == null)
@@ -76,12 +83,17 @@ public class Generator {
         return codeBlock;
     }
 
+    /**
+     * Генерирует код для одного TreeNode, рекурсивно генерируя код для его правого и левого листа, если они есть.
+     * @param treeNode TreeNode, для которого необходимо сгенерировать код.
+     * @return CodeBlock, соответствующий коду для данного treeNode.
+     */
     public static CodeBlock generate_code(TreeNode treeNode){
-        // Гененрирует код для одного TreeNode.
         if (treeNode == null)
             return null;
         CodeBlock codeBlock = new CodeBlock();
 
+        // Получаем код левого и правых листьев.
         CodeBlock left_block = generate_code(treeNode.getLeft());
         CodeBlock right_block = generate_code(treeNode.getRight());
 
@@ -419,7 +431,12 @@ public class Generator {
         return codeBlock;
     }
 
-    public static void generate_code(List<Block> blocks){
+    /**
+     * Генерирует код из блоков кода дерева разбора.
+     * @param blocks Блоки кода, полученные на этапе синтаксического разбора.
+     * @return CodeBlock, содеражащий код в виде CodeExpressions.
+     */
+    public static CodeBlock generate_code(List<Block> blocks){
         // Готовый исходный код:
         List<CodeBlock> Code = new ArrayList<>();
 
@@ -432,7 +449,6 @@ public class Generator {
             output_code.addExpressions(codeBlock.getExpressions());
         }
 
-        String code_out = output_code.toCode();
-        System.out.println(output_code);
+        return output_code;
     }
 }
