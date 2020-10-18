@@ -26,6 +26,9 @@ public class Controller implements Initializable {
     private Button button_parse;
 
     @FXML
+    private TextArea textfield_outputCode;
+
+    @FXML
     private TableView<RowLexemaTableName> table_lexemas;
 
     @FXML

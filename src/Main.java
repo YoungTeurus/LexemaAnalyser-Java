@@ -30,7 +30,7 @@ public class Main extends Application {
         SyntaxParser.SyntaxParserOutput spo;
         try {
             spo = SyntaxParser.get_lexema_levels(lpo.output_lexema_list);
-            List<Block> blocks = SyntaxParser.get_tree(spo.blocks, lpo.output_lexema_list);
+            List<Block> blocks = SyntaxParser.get_tree(spo, lpo.output_lexema_list);
             Generator.generate_code(blocks);
             // System.out.println(spo);
         }
