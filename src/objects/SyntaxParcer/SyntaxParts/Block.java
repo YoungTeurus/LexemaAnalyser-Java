@@ -13,9 +13,9 @@ import java.util.List;
  */
 public class Block {
     //TODO: можно ли вынести это отсюда?
-    public List<List<List<TreeNode>>> expressions; // Выражения в блоке
+    public List<List<List<TreeNode>>> expressions; // Выражения в блоке, упорядоченные по вложенности.
 
-    public List<TreeNode> content;  // Содержание блока
+    public List<TreeNode> content;  // Содержание блока - все TreeNode, которые входят в данный Block.
     public int id;  // Идентификатор блока
 
     public Block(int id){

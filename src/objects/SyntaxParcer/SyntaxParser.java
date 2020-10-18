@@ -15,8 +15,9 @@ import static objects.SyntaxParcer.Rules.StaticRules.*;
 public class SyntaxParser {
 
     public static class SyntaxParserOutput {
-        public List<Block> blocks; // Список блоков
-        public List<TreeNode> expressions_trees;  // Список деревеьев для каждого из выражений
+        // Block.content - блок кода
+        // |_ TreeNode - деревья
+        public List<Block> blocks; // Список блоков по уровням (?)
     }
 
     public static SyntaxParserOutput get_lexema_levels(List<Lexema> output_lexema_list) throws SyntaxParcerException {
@@ -33,8 +34,8 @@ public class SyntaxParser {
             output_treenode_lexema_list.add(new TreeNode().setContent(lex));
         }
 
-        /**
-         * Класс для хранения состояния парсера. Сохраняет уровни вложенности на момент входа во внутренний блок.
+        /*
+          Класс для хранения состояния парсера. Сохраняет уровни вложенности на момент входа во внутренний блок.
          */
         class ParserState{
             Block current_block;
@@ -51,19 +52,17 @@ public class SyntaxParser {
         }
 
         // Block.content - блок кода
-        // |_ TreeNode - деревья
+        // |_ Expressions - выражения
+        //  |_ Levels - уровни внутри одного выражения
+        //     |_ Level - уровень
+        //        |_ TreeNode - дерево-лист
+        //           |_.getContent() -> Lexema - лексема
         int last_block_id = 0;
         Stack<ParserState> upper_states = new Stack<>();  // Стак вложенности блоков (для поддержки фигурных скобок и вложенности)
         ArrayList<Block> blocks = new ArrayList<>();  // Список всех блоков (для вывода)
         blocks.add(new Block(last_block_id));
         Block current_block = blocks.get(last_block_id);  // Текущий блок кода
 
-
-        // Expression - отдельные выражения (разделённые ;)
-        // |_ Levels - уровни внутри одного выражения
-        //    |_ Level - уровень
-        //       |_ TreeNode - дерево-лист
-        //          |_.getContent() -> Lexema - лексема
         List<List<List<TreeNode>>> expressions = current_block.expressions;
         expressions.add(new ArrayList<>());
 
@@ -215,19 +214,17 @@ public class SyntaxParser {
         return po;
     }
 
-    public static List<Block> get_tree(List<Block> blocks,
+    public static List<Block> get_tree(SyntaxParserOutput spo,
                                           List<Lexema> output_lexema_list) throws SyntaxParcerException {
         // Строим дерево с помощью списка уровня лексем
-        List<TreeNode> expressions_trees = new ArrayList<>(); // Список, содержащий все TreeNode отдельных команд
-        for (Block current_block : blocks){
+        for (Block current_block : spo.blocks){
             List<List<List<TreeNode>>> expressions = current_block.expressions;
             // Копия исходного листа, в котором будем хранить лексемы и TreeNode-ы
-            for (int current_expression = 0; current_expression < expressions.size(); current_expression++){
+            for (List<List<TreeNode>> levels : expressions) {
                 // Разбираем по одному выражению
-                List<List<TreeNode>> levels = expressions.get(current_expression);
-                for (int current_level = levels.size() - 1; current_level >= 0; current_level--){
+                for (int current_level = levels.size() - 1; current_level >= 0; current_level--) {
                     // Начинаем с самого глубокого (большого по числу) уровня
-                    for(TreeNode node : levels.get(current_level)){
+                    for (TreeNode node : levels.get(current_level)) {
                         int node_i = current_block.content.indexOf(node); // Порядковый номер node
 
                         // Использует ли оператор элемент слева
@@ -238,17 +235,16 @@ public class SyntaxParser {
                         TreeNode left_neighbour = null;
                         TreeNode right_neighbour;
 
-                        if (use_left_neighbour){
+                        if (use_left_neighbour) {
                             // Пытаемся взять элемент слева:
                             int left_neighbour_offset = StaticRules.leftNeighbourOffset.getOrDefault(
                                     node.getContent().get_char(), defaultLeftNeighbourOffset
                             );
                             try {
                                 left_neighbour = current_block.content.get(node_i + left_neighbour_offset);
-                            }
-                            catch (IndexOutOfBoundsException e){
+                            } catch (IndexOutOfBoundsException e) {
                                 throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Невозможно найти левый " +
-                                        "элемент для оператора %s на позиции %d.", node.getContent().get_char(),
+                                                "элемент для оператора %s на позиции %d.", node.getContent().get_char(),
                                         output_lexema_list.indexOf(node.getContent())
                                 )
                                 );
@@ -260,46 +256,39 @@ public class SyntaxParser {
                         // Пытаемся взять элемент справа:
                         try {
                             right_neighbour = current_block.content.get(node_i + right_neighbour_offset);
-                        }
-                        catch (IndexOutOfBoundsException e){
+                        } catch (IndexOutOfBoundsException e) {
                             throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Невозможно найти правый " +
-                                    "элемент для оператора %s на позиции %d.", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent()) ));
+                                    "элемент для оператора %s на позиции %d.", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent())));
                         }
 
                         // Пытаемся найти правило для текущего оператора:
-                        LeftRightRulesCombo rulesCombo =  StaticRules.stringLeftRightRulesComboMap.getOrDefault(
+                        LeftRightRulesCombo rulesCombo = StaticRules.stringLeftRightRulesComboMap.getOrDefault(
                                 node.getContent().get_char(),
                                 leftRightRulesCombo_ForDefaultOperator
                         );
 
-                        if (use_left_neighbour){
-                            if (rulesCombo.leftRule.check(left_neighbour)){
+                        if (use_left_neighbour) {
+                            if (rulesCombo.leftRule.check(left_neighbour)) {
                                 node.setLeft(left_neighbour);
-                            }
-                            else{
+                            } else {
                                 throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Левый элемент для оператора " +
-                                        "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent()) ));
+                                        "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent())));
                             }
                         }
 
-                        if (rulesCombo.rightRule.check(right_neighbour)){
+                        if (rulesCombo.rightRule.check(right_neighbour)) {
                             node.setRight(right_neighbour);
-                        }
-                        else{
+                        } else {
                             throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Правый элемент для оператора " +
-                                    "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent()) ));
+                                    "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent())));
                         }
 
                         // Удаление использованных лексем:
-                        if (use_left_neighbour){
+                        if (use_left_neighbour) {
                             current_block.content.remove(left_neighbour);
                         }
                         current_block.content.remove(right_neighbour);
 
-                        if (current_level == 0){
-                            // Если дошли до верхнего уровня, добавляем текущее дерево на вывод
-                            expressions_trees.add(node);
-                        }
                     }
                 }
             }
@@ -307,7 +296,7 @@ public class SyntaxParser {
 
 
         //TODO: сделать проверку на наличие деревьев, НЕ входящих в конечное выражение, что является ошибкой.
-        for (Block block : blocks){
+        for (Block block : spo.blocks){
             for (TreeNode treeNode : block.content){
                 if (treeNode.is_leaf()){
                     throw new SyntaxParcerException("Найдены незадействованные лексемы! Проверьте исходный код!");
@@ -315,7 +304,7 @@ public class SyntaxParser {
             }
         }
 
-        // expression_trees содержит список деревьев разбора для каждого из выражений
-        return blocks;
+        // blocks содержит список деревьев разбора для каждого из выражений
+        return spo.blocks;
     }
 }

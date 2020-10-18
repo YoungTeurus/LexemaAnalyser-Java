@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import objects.CodeGenerator.Generator;
 import objects.LexemaParcer.Lexema;
 import objects.LexemaParcer.LexemaParser;
 import objects.SyntaxParcer.SyntaxParser;
@@ -137,14 +138,15 @@ public class Controller implements Initializable {
         SyntaxParser.SyntaxParserOutput spo;
         try {
             spo = SyntaxParser.get_lexema_levels(lpo.output_lexema_list);
-            // spo.expressions_trees = SyntaxParser.get_tree(spo.output_treenode_lexema_list, spo.expressions, lpo.output_lexema_list);
+            SyntaxParser.get_tree(spo, lpo.output_lexema_list);
             append_logs("Синтаксический анализ прошёл успешно!\n");
+
+            // 5) Вывод текста программы на ЯП Ассемблер
+            String output_code = Generator.generate_code(spo.blocks).toCode();
         }
         catch (SyntaxParcerException e){
             append_logs(e.toString() + "\n");
         }
-
-        // TODO: 5) Вывод текста программы на ЯП Ассемблер
     }
 
     /**
