@@ -1,6 +1,5 @@
 package objects.SyntaxParcer.SyntaxParts;
 
-import com.sun.org.apache.xml.internal.serializer.ToStream;
 import objects.LexemaParcer.Lexema;
 
 public class TreeNode {
@@ -26,6 +25,13 @@ public class TreeNode {
     }
     public TreeNode getRight() {
         return right;
+    }
+
+    public Object getLeftValue(){
+        return left==null?null:left.content._value;
+    }
+    public Object getRightValue(){
+        return right==null?null:right.content._value;
     }
 
     private TreeNode left;
