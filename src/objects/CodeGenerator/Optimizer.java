@@ -17,6 +17,14 @@ public class Optimizer {
     ));
 
     /**
+     * Операторы в этом списке запрещают удаление кода между двумя LOAD-ами.
+     * Обычно это операторы сохранения в переменную - STORE - и вывода на экран - OUT.
+     */
+    static List<String> importanceOperators = new ArrayList<>(Arrays.asList(
+            "STORE", "OUT", "CMP"
+    ));
+
+    /**
      * Оптимизирует код, используя правила перестановки, перемещения и удаления строк.
      *
      * Правила:
@@ -36,7 +44,7 @@ public class Optimizer {
      * Упрощённое правило: может быть удалено LOAD VAR0, для этого достаточно, чтобы LOAD VAR0 не встречалось в других частях программы.
      *
      * 3) Последовательность операторов
-     *      LOAD VAR0;
+     *      LOAD VAR0; (или IN VAR0;)
      *      STORE VAR1;
      * могут быть удалены, если за ними не следует другой оператор LOAD и нет перехода к оператору STORE VAR1, а последующие
      * VAR1 будут замены на VAR0 вполть до того места, где появляется другой оператор STORE VAR1 (исключая его).
@@ -51,6 +59,22 @@ public class Optimizer {
 
         ruleNumberOne(input_code);
         ruleNumberTwo(input_code);
+        while(ruleNumberThree(input_code)){
+        }
+        while (true){
+            ruleNumberOne(input_code);
+            boolean a = ruleNumberTwo(input_code);
+            boolean b = false;
+            while(ruleNumberThree(input_code)){
+                b = true;
+            }
+            if (!(a || b)){
+                break;
+            }
+        }
+
+        ruleNumberFour(input_code);
+        ruleNumberFive(input_code);
 
         return input_code;
     }
@@ -106,6 +130,25 @@ public class Optimizer {
         List<String> temp = one.getArgs();
         one.setArgs(another.getArgs());
         another.setArgs(temp);
+    }
+
+    /**
+     * Заменяет аргумент old_arg в выражении expression на аргумент new_arg.
+     * Заменяет ВСЕ old_arg в выражении, если их больше 1.
+     * Не производит никаких действий, если данный аргумент не был найден.
+     */
+    private static void changeArg(CodeExpression expression, String old_arg, String new_arg){
+        List<Integer> foundOldArgs = new ArrayList<>();
+        int i =0;
+        for (String arg : expression.getArgs()){
+            if (arg.equals(old_arg)){
+                foundOldArgs.add(i);
+            }
+            i++;
+        }
+        for (int iOfOldArg : foundOldArgs){
+            expression.getArgs().set(iOfOldArg, new_arg);
+        }
     }
 
     /**
@@ -200,7 +243,7 @@ public class Optimizer {
 
     /**
      * 3) Последовательность операторов
-     *      LOAD VAR0;
+     *      LOAD VAR0; (или IN VAR0;)
      *      STORE VAR1;
      * могут быть удалены, если за ними не следует другой оператор LOAD и нет перехода к оператору STORE VAR1, а последующие
      * VAR1 будут замены на VAR0 вполть до того места, где появляется другой оператор STORE VAR1 (исключая его).
@@ -213,39 +256,143 @@ public class Optimizer {
 
         List<Integer> items_to_remove = new ArrayList<>(); // Список индексов элементов, которые должны быть удалены
         for (CodeExpression currentExpression : input_code.getExpressions()) {
-            if (i < size - 1 && currentExpression.getCommand().equals("LOAD")) {
+            if (i < size - 1 &&
+                    //(
+                            currentExpression.getCommand().equals("LOAD")
+                    //                || currentExpression.getCommand().equals("IN")
+                    //)
+            ) {
                 // Если текущая команда не последняя и является командой "STORE"...
+                CodeExpression nextExpression = input_code.get(i + 1);
+                if (!nextExpression.getCommand().equals("STORE")) {
+                    // Если следующая операция не "STORE" - переходим к следующей строчке.
+                    i++;
+                    continue;
+                }
+                if (compareArgs(currentExpression, nextExpression)){
+                    // Если аргументы совпадают, то это что-то странное - выходим.
+                    // Это должно исправлять правило 2.
+                    i++;
+                    continue;
+                }
+                boolean deleteLOAD = true;
+                if (i < size - 2 && !input_code.get(i+2).getCommand().equals("LOAD")){
+                    // Если после первой команды STORE следует любая команда кроме LOAD -
+                    // нужно удалять только первый STORE, сохраняя LOAD.
+                    deleteLOAD = false;
+                }
+                // Если имеются последовательные LOAD и STORE с разными аргументами...
+                // Ищем следующее использование аргумента STORE по коду:
+                for (int j = i + 2; j < size; j++){
+                    CodeExpression cur_expr = input_code.get(j);
+                    if (containsArgsOf(nextExpression, cur_expr)){
+                        // Если используется, то заменяем аргументы VAR1 на VAR0.
+                        // Пока не наткнёмся на STORE с аргументом VAR1.
+                        if (cur_expr.getCommand().equals("STORE") && containsArgsOf(nextExpression, cur_expr)){
+                            break;
+                        }
+                        // Меняем VAR1 на VAR0:
+                        changeArg(cur_expr, nextExpression.getArgs().get(0), currentExpression.getArgs().get(0));
+                    }
+                }
+                if (deleteLOAD){
+                    items_to_remove.add(i);
+                }
+                items_to_remove.add(i+1);
+                wasDeleted = true;
             }
-            CodeExpression nextExpression = input_code.get(i + 1);
-            if (!nextExpression.getCommand().equals("STORE")) {
-                // Если следующая операция не "STORE" - переходим к следующей строчке.
-                i++;
-                continue;
+            i++;
+        }
+
+        if (wasDeleted){
+            // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
+            for (int j = items_to_remove.size() - 1; j >= 0; j--){
+                input_code.getExpressions().remove((int)items_to_remove.get(j));
             }
-            if (i < size - 2 && input_code.get(i+1).getCommand().equals("STORE")){
-                // Если после первой команды STORE следует вторая команда STORE - не можем удалить и переходим к следующей строчке.
-                // TODO: Нет, на самом деле нужно удалять только первый STORE, сохраняя LOAD.
-                i++;
-                continue;
-            }
-            if (compareArgs(currentExpression, nextExpression)){
-                // Если аргументы совпадают, то это что-то странное - выходим.
-                // Это должно исправлять правило 2.
-                i++;
-                continue;
-            }
-            // Если имеются последовательные LOAD и STORE с разными аргументами...
-            // Ищем следующее использование аргумента STORE по коду:
-            List<Integer> itemsToContainVAR1 = new ArrayList<>();
-            for (int j = i + 2; j < size; j++){
-                if (containsArgsOf(nextExpression, input_code.get(j))){
-                    // Если используется, то запоминаем эту строчку для последующей проверки...
-                    // Пока не наткнёмся на STORE с таким же аргументом
-                    if (input_code.get(j).getCommand().equals("STORE")){
+        }
+
+        return wasDeleted;
+    }
+
+    /**
+     * 4) Оператор
+     *      STORE VAR0;
+     * может быть удалён, если за ним не следует хотя бы один оператор, использующий VAR0.
+     * @return Возвращает true, если была сделана хотя бы одна замена, иначе вернёт false.
+     */
+    private static boolean ruleNumberFour(CodeBlock input_code){
+        int i = 0;
+        int size = input_code.size();
+        boolean wasDeleted = false;
+        List<Integer> items_to_remove = new ArrayList<>(); // Список индексов элементов, которые должны быть удалены
+        for (CodeExpression currentExpression : input_code.getExpressions()) {
+            if (currentExpression.getCommand().equals("STORE")) {
+                // Если текущая команда является командой "STORE"...
+                boolean needToDeleteSTORE = true;
+                for (int j = i + 1; j < size; j++){
+                    CodeExpression cur_exp = input_code.get(j);
+                    if (containsArgsOf(currentExpression, cur_exp)){
+                        // Если нашли хотя бы одно выражение, содрежащее аргумент STORE - переходим к следующей строке
+                        needToDeleteSTORE = false;
                         break;
                     }
-                    itemsToContainVAR1.add(j);
                 }
+                if (needToDeleteSTORE) {
+                    // Если не нашли ни одного использования STORE - удаляем его.
+                    items_to_remove.add(i);
+                    wasDeleted = true;
+                }
+            }
+            i++;
+        }
+
+        if (wasDeleted){
+            // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
+            for (int j = items_to_remove.size() - 1; j >= 0; j--){
+                input_code.getExpressions().remove((int)items_to_remove.get(j));
+            }
+        }
+
+        return wasDeleted;
+    }
+
+    /**
+     * 5) Последовательность операторов, начинающихся с
+     *      LOAD VAR0;
+     * и заканчивающаяся:
+     *      LOAD VAR1;
+     * может быть удалена (не включая LOAD VAR1;), если между LOAD-ами нет команды STORE или OUT.
+     * @return Возвращает true, если была сделана хотя бы одна замена, иначе вернёт false.
+     */
+    private static boolean ruleNumberFive(CodeBlock input_code){
+        int i = 0;
+        int size = input_code.size();
+        boolean wasDeleted = false;
+        List<Integer> items_to_remove = new ArrayList<>(); // Список индексов элементов, которые должны быть удалены
+        for (CodeExpression currentExpression : input_code.getExpressions()) {
+            if (currentExpression.getCommand().equals("LOAD")) {
+                // Если текущая команда является командой "LOAD"...
+                // Ищем следующую команду LOAD или STORE.
+                // Если нашли STORE или OUT - пропускаем текущий LOAD и переходим к следующей строчке.
+                // Если нашли LOAD - удаляем код между ним и первым LOAD.
+                boolean needToDeleteLOADBLOCK = true;
+                int j = i + 1;
+                for (; j < size; j++){
+                    CodeExpression cur_exp = input_code.get(j);
+                    if (importanceOperators.contains(cur_exp.getCommand())){
+                        needToDeleteLOADBLOCK = false;
+                        break;
+                    }
+                    if (cur_exp.getCommand().equals("LOAD")){
+                        break;
+                    }
+                }
+                if (needToDeleteLOADBLOCK){
+                    for(int i1 = i; i1 < j; i1++){
+                        items_to_remove.add(i1);
+                    }
+                }
+                wasDeleted = true;
             }
             i++;
         }

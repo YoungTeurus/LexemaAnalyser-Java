@@ -291,7 +291,7 @@ public class Generator {
                     case "NOT":{
                         // Присваиваю вершине _value = ${last_id}
                         treeNode.getContent()._value = String.format("$%d", last_id++);
-                        // Код на вывод: LOAD left.value; ADD right.value; STORE top.value;
+                        // Код на вывод: LOAD right.value; NOT; STORE top.value;
                         codeBlock.addExpression(
                                     new CodeExpression()
                                             .setCommand("LOAD")
@@ -425,10 +425,14 @@ public class Generator {
                         break;
                     }
                     case "IN":{
-                        // Код на вывод: IN right.value;
+                        // Код на вывод: IN; STORE right.value;
                         codeBlock.addExpression(
                                 new CodeExpression()
                                         .setCommand("IN")
+                        );
+                        codeBlock.addExpression(
+                                new CodeExpression()
+                                        .setCommand("STORE")
                                         .addArg(treeNode.getRightValue().toString())
                         );
                         // Дописываем код правой части в начало текущего кода:
@@ -436,11 +440,15 @@ public class Generator {
                         break;
                     }
                     case "OUT":{
-                        // Код на вывод: OUT right.value;
+                        // Код на вывод: LOAD right.value; OUT;
+                        codeBlock.addExpression(
+                                new CodeExpression()
+                                        .setCommand("LOAD")
+                                        .addArg(treeNode.getRightValue().toString())
+                        );
                         codeBlock.addExpression(
                                 new CodeExpression()
                                         .setCommand("OUT")
-                                        .addArg(treeNode.getRightValue().toString())
                         );
                         // Дописываем код правой части в начало текущего кода:
                         codeBlock.addExpressions(0, right_block.getExpressions());
