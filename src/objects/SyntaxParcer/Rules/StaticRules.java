@@ -6,13 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StaticRules {
-    // public static final IRule ruleForOperator = new TypeRule(Lexema.lexema_types.OPERATOR);
-    // public static final IRule ruleForNotOperator = new NOTRule(ruleForOperator);
     public static final IRule ruleForEqualChar = new CharRule("=");
     public static final IRule ruleForNotEqualChar = new NOTRule(ruleForEqualChar);
 
     public static final IRule ruleForIfOperator = new ANDRule(
-            new CharRule("if"),
+            new CharRule("IF"),
             new TypeRule(Lexema.lexema_types.OPERATOR)
     );
 
@@ -43,8 +41,8 @@ public class StaticRules {
 
     // Проверка на принадлежность к логическим операторам
     public static final IRule ruleForBoolOperator = new ORRule(
-            new ORRule(new CharRule("and"), new CharRule("or")),
-            new ORRule(new CharRule("xor"), new CharRule("not"))
+            new ORRule(new CharRule("AND"), new CharRule("OR")),
+            new ORRule(new CharRule("XOR"), new CharRule("NOT"))
     );
 
     // Правила для конкретных проверок:
@@ -92,27 +90,29 @@ public class StaticRules {
         stringLeftRightRulesComboMap.put("-",leftRightRulesCombo_ForArithmetic);
         stringLeftRightRulesComboMap.put("*",leftRightRulesCombo_ForArithmetic);
         stringLeftRightRulesComboMap.put("/",leftRightRulesCombo_ForArithmetic);
-        stringLeftRightRulesComboMap.put("if", leftRightRulesCombo_ForIfOperator);
-        stringLeftRightRulesComboMap.put("else", leftRightRulesCombo_ForElseOperator);
+        stringLeftRightRulesComboMap.put("IF", leftRightRulesCombo_ForIfOperator);
+        stringLeftRightRulesComboMap.put("ELSE", leftRightRulesCombo_ForElseOperator);
     }
 
     public static final Boolean defaultDoesLexemaUsesLeftNeighbour = true;
     // Словарь типа "строковое_представление, использует_ли_данный_оператор_левый_элемент"
     public static final Map<String, Boolean> doesLexemaUsesLeftNeighbour = new HashMap<>();
     static {
-        doesLexemaUsesLeftNeighbour.put("not", false);
+        doesLexemaUsesLeftNeighbour.put("NOT", false);
+        doesLexemaUsesLeftNeighbour.put("IN", false);
+        doesLexemaUsesLeftNeighbour.put("OUT", false);
     }
 
     // Смещение для поиска левого соседа
     public static final Integer defaultLeftNeighbourOffset = -1;
     public static final Map<String, Integer> leftNeighbourOffset = new HashMap<>();
     static {
-        leftNeighbourOffset.put("if", 1);
+        leftNeighbourOffset.put("IF", 1);
     }
     // Смещение для поиска правого соседа
     public static final Integer defaultRightNeighbourOffset = 1;
     public static final Map<String, Integer> rightNeighbourOffset = new HashMap<>();
     static {
-        rightNeighbourOffset.put("if", 2);
+        rightNeighbourOffset.put("IF", 2);
     }
 }

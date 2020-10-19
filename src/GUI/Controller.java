@@ -48,8 +48,13 @@ public class Controller implements Initializable {
     /**
      * Очищает окно логов.
      */
-    private void clear_logs(){
+    private void clear(){
         textfield_log.clear();
+        table_lexemas.getItems().clear();
+        table_hashtable.getItems().clear();
+        textfield_output.clear();
+        textfield_outputCode.clear();
+        textfield_outputCode_Optimised.clear();
     }
 
     /**
@@ -129,7 +134,7 @@ public class Controller implements Initializable {
      */
     private void parce_input_code(){
         // Очистка логов и таблиц компилятора:
-        clear_logs();
+        clear();
 
         // 1) Получение исходного текста кода.
         String input_string = get_input_string();

@@ -306,7 +306,7 @@ public class Generator {
                                         .setCommand("STORE")
                                         .addArg(treeNode.getContent().get_value().toString())
                         );
-                        // Дописываем код левой и правой частей в начало текущего кода:
+                        // Дописываем код правой части в начало текущего кода:
                         codeBlock.addExpressions(0, right_block.getExpressions());
                         break;
                     }
@@ -379,7 +379,7 @@ public class Generator {
                         codeBlock.addExpressions(0, left_block.getExpressions());
                         break;
                     }
-                    case "if":{
+                    case "IF":{
                         // Условие:
                         codeBlock.addExpressions(left_block.getExpressions());
                         // ._value IF-а - это количество строк условия + 1
@@ -414,7 +414,7 @@ public class Generator {
                         codeBlock.addExpression(new CodeExpression().setCommand("NOP"));
                         break;
                     }
-                    case "else":{
+                    case "ELSE":{
                         for(int i=0; i < (int)treeNode.getLeft().getContent()._value; i++){
                             codeBlock.addExpression(left_block.get(i));
                         }
@@ -422,6 +422,28 @@ public class Generator {
                         for(int i= (int)treeNode.getLeft().getContent()._value; i < left_block.size(); i++){
                             codeBlock.addExpression(left_block.get(i));
                         }
+                        break;
+                    }
+                    case "IN":{
+                        // Код на вывод: IN right.value;
+                        codeBlock.addExpression(
+                                new CodeExpression()
+                                        .setCommand("IN")
+                                        .addArg(treeNode.getRightValue().toString())
+                        );
+                        // Дописываем код правой части в начало текущего кода:
+                        codeBlock.addExpressions(0, right_block.getExpressions());
+                        break;
+                    }
+                    case "OUT":{
+                        // Код на вывод: OUT right.value;
+                        codeBlock.addExpression(
+                                new CodeExpression()
+                                        .setCommand("OUT")
+                                        .addArg(treeNode.getRightValue().toString())
+                        );
+                        // Дописываем код правой части в начало текущего кода:
+                        codeBlock.addExpressions(0, right_block.getExpressions());
                         break;
                     }
                 }
