@@ -438,6 +438,7 @@ public class Generator {
      */
     public static CodeBlock generate_code(List<Block> blocks){
         // Готовый исходный код:
+        last_id = 0;
         List<CodeBlock> Code = new ArrayList<>();
 
         Block main_block = blocks.get(0);

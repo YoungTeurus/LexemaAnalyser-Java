@@ -197,4 +197,66 @@ public class Optimizer {
 
         return wasDeleted;
     }
+
+    /**
+     * 3) Последовательность операторов
+     *      LOAD VAR0;
+     *      STORE VAR1;
+     * могут быть удалены, если за ними не следует другой оператор LOAD и нет перехода к оператору STORE VAR1, а последующие
+     * VAR1 будут замены на VAR0 вполть до того места, где появляется другой оператор STORE VAR1 (исключая его).
+     * @return Возвращает true, если была сделана хотя бы одна замена, иначе вернёт false.
+     */
+    private static boolean ruleNumberThree(CodeBlock input_code){
+        boolean wasDeleted = false;
+        int i = 0;
+        int size = input_code.size();
+
+        List<Integer> items_to_remove = new ArrayList<>(); // Список индексов элементов, которые должны быть удалены
+        for (CodeExpression currentExpression : input_code.getExpressions()) {
+            if (i < size - 1 && currentExpression.getCommand().equals("LOAD")) {
+                // Если текущая команда не последняя и является командой "STORE"...
+            }
+            CodeExpression nextExpression = input_code.get(i + 1);
+            if (!nextExpression.getCommand().equals("STORE")) {
+                // Если следующая операция не "STORE" - переходим к следующей строчке.
+                i++;
+                continue;
+            }
+            if (i < size - 2 && input_code.get(i+1).getCommand().equals("STORE")){
+                // Если после первой команды STORE следует вторая команда STORE - не можем удалить и переходим к следующей строчке.
+                // TODO: Нет, на самом деле нужно удалять только первый STORE, сохраняя LOAD.
+                i++;
+                continue;
+            }
+            if (compareArgs(currentExpression, nextExpression)){
+                // Если аргументы совпадают, то это что-то странное - выходим.
+                // Это должно исправлять правило 2.
+                i++;
+                continue;
+            }
+            // Если имеются последовательные LOAD и STORE с разными аргументами...
+            // Ищем следующее использование аргумента STORE по коду:
+            List<Integer> itemsToContainVAR1 = new ArrayList<>();
+            for (int j = i + 2; j < size; j++){
+                if (containsArgsOf(nextExpression, input_code.get(j))){
+                    // Если используется, то запоминаем эту строчку для последующей проверки...
+                    // Пока не наткнёмся на STORE с таким же аргументом
+                    if (input_code.get(j).getCommand().equals("STORE")){
+                        break;
+                    }
+                    itemsToContainVAR1.add(j);
+                }
+            }
+            i++;
+        }
+
+        if (wasDeleted){
+            // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
+            for (int j = items_to_remove.size() - 1; j >= 0; j--){
+                input_code.getExpressions().remove((int)items_to_remove.get(j));
+            }
+        }
+
+        return wasDeleted;
+    }
 }

@@ -6,7 +6,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import objects.CodeGenerator.CodeBlock;
 import objects.CodeGenerator.Generator;
+import objects.CodeGenerator.Optimizer;
 import objects.LexemaParcer.Lexema;
 import objects.LexemaParcer.LexemaParser;
 import objects.SyntaxParcer.SyntaxParser;
@@ -39,6 +41,9 @@ public class Controller implements Initializable {
 
     @FXML
     private TableView<RowHashTableName> table_hashtable;
+
+    @FXML
+    private TextArea textfield_outputCode_Optimised;
 
     /**
      * Очищает окно логов.
@@ -119,7 +124,8 @@ public class Controller implements Initializable {
      * 2) Лексический анализ кода.
      * 3) Заполнение таблиц компилятора
      * 4) Синтаксический анализ кода.
-     * TODO: 5) Вывод текста программы на ЯП Ассемблер
+     * 5) Вывод текста программы на ЯП Ассемблер
+     * 6) Оптимизация кода
      */
     private void parce_input_code(){
         // Очистка логов и таблиц компилятора:
@@ -145,8 +151,12 @@ public class Controller implements Initializable {
             append_logs("Синтаксический анализ прошёл успешно!\n");
 
             // 5) Вывод текста программы на ЯП Ассемблер
-            String output_code = Generator.generate_code(spo.blocks).toCode();
-            textfield_outputCode.setText(output_code);
+            CodeBlock output_code = Generator.generate_code(spo.blocks);
+            String output_code_string = output_code.toCode();
+            textfield_outputCode.setText(output_code_string);
+            // 6) Оптимизация кода
+            String output_code_optimized_string = Optimizer.optimize(output_code).toCode();
+            textfield_outputCode_Optimised.setText(output_code_optimized_string);
         }
         catch (SyntaxParcerException e){
             append_logs(e.toString() + "\n");
