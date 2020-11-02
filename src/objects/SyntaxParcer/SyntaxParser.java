@@ -88,7 +88,7 @@ public class SyntaxParser {
             boolean add_node_to_block = true;
             Lexema lex = node.getContent();
             if (lex.get_type() == Lexema.lexema_types.OPERATOR){
-                if (lex.get_char().equals("=")){
+                if (lex.get_char().equals("=") || lex.get_char().equals("!=")){
                     // Особый случай "=" - создаём новый уровень, который выше текущего
                     List<TreeNode> new_upper_level = new ArrayList<>();
                     new_upper_level.add(node);

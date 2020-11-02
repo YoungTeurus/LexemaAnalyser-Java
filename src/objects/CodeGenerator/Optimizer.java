@@ -75,6 +75,7 @@ public class Optimizer {
 
         ruleNumberFour(input_code);
         ruleNumberFive(input_code);
+        ruleNumberEight(input_code);
 
         return input_code;
     }
@@ -392,6 +393,36 @@ public class Optimizer {
                         items_to_remove.add(i1);
                     }
                 }
+                wasDeleted = true;
+            }
+            i++;
+        }
+
+        if (wasDeleted){
+            // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
+            for (int j = items_to_remove.size() - 1; j >= 0; j--){
+                input_code.getExpressions().remove((int)items_to_remove.get(j));
+            }
+        }
+
+        return wasDeleted;
+    }
+
+    /**
+     * 6) Оператор
+     *      NOP;
+     * может быть удалён, если после него есть любая команда.
+     * @return Возвращает true, если была сделана хотя бы одна замена, иначе вернёт false.
+     */
+    private static boolean ruleNumberEight(CodeBlock input_code){
+        int i = 0;
+        int size = input_code.size();
+        boolean wasDeleted = false;
+        List<Integer> items_to_remove = new ArrayList<>(); // Список индексов элементов, которые должны быть удалены
+        for (CodeExpression currentExpression : input_code.getExpressions()) {
+            if (currentExpression.getCommand().equals("NOP") && i + 1 < size) {
+                // Если текущая команда является командой "NOP" и за ней есть ещё одна команда.
+                items_to_remove.add(i);
                 wasDeleted = true;
             }
             i++;
