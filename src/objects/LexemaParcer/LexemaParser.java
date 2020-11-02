@@ -5,6 +5,8 @@ import objects.Hashing.UniversalHashFunction_ForString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LexemaParser {
     public static class LexemaParserOutput {
@@ -14,6 +16,8 @@ public class LexemaParser {
     }
 
     private final static int DEFAULT_HASH_TABLE_SIZE = 255; // Длина хеш-таблицы
+
+    private final static String regex_pattern = "-?\\d+(.\\d+)*|[:(){}=<>;+\\-\\*\\\\]|[a-zA-Z0-9_]+";
 
     /**
      * Метод подготавливает исходную строку для прохода парсера.
@@ -37,57 +41,11 @@ public class LexemaParser {
     private static List<String> get_lexemas(String input_string){
         ArrayList<String> return_list = new ArrayList<>();
 
-        int string_len = input_string.length();
-        int lex_start = 0;  // Индекс начала лексемы
-        int next_char_i;  // Индекс следующего символа в строке
-        char next_char;  // Следующий символ в строке
-        StringBuilder current_lexema;  // Текущая лексема
+        Pattern pattern = Pattern.compile(regex_pattern);
+        Matcher matcher = pattern.matcher(input_string);
 
-        while (lex_start < string_len){
-            boolean not_splitter_lexema = true;  // Является ли текущая лексема сплиттером
-            current_lexema = new StringBuilder(String.valueOf(input_string.charAt(lex_start)));
-            // Если встретили отдельный пробел, просто пропускаем его:
-            if (current_lexema.toString().equals(" ")){
-                lex_start += 1;
-                continue;
-            }
-            // Если новая лексема начинается с символа, который есть у опреатора:
-            if (Lexema.is_start_of_splitter(current_lexema.toString())){
-                // Начинаем искать конец сплиттера
-                next_char_i = lex_start + 1;
-                while (next_char_i < string_len){
-                    next_char = input_string.charAt(next_char_i);
-                    if (Lexema.is_start_of_splitter(current_lexema.toString() + next_char)){
-                        current_lexema.append(next_char);
-                        next_char_i += 1;
-                        lex_start += 1;
-                    }
-                    else{
-                        if (Lexema.is_splitter(current_lexema.toString())){
-                            // Если уже составили сплиттер, прекращаем обход
-                            not_splitter_lexema = false;
-                        }
-                        // Если лексема-сплиттер прерывается, начинаем обрабатывать её как обычную лексему
-                        break;
-                    }
-                }
-            }
-            if (not_splitter_lexema){
-                next_char_i = lex_start + 1;
-                while (next_char_i < string_len){
-                    next_char = input_string.charAt(next_char_i);
-                    // Пока не нашли сплиттер:
-                    if (Lexema.splitters.contains(String.valueOf(next_char))){
-                        break;
-                    }
-                    current_lexema.append(next_char);
-                    next_char_i += 1;
-                    lex_start += 1;
-                }
-            }
-            // Когда дошли до конца лексемы
-            lex_start += 1;
-            return_list.add(current_lexema.toString());
+        while (matcher.find()){
+            return_list.add(input_string.substring(matcher.start(), matcher.end()));
         }
 
         return return_list;
