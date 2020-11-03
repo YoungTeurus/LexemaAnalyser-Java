@@ -115,4 +115,11 @@ public class StaticRules {
     static {
         rightNeighbourOffset.put("IF", 2);
     }
+
+    // Может ли оператор быть унарным
+    public static final Boolean defaultCanBeUnary = false;
+    public static final Map<String, Boolean> canBeUnary = new HashMap<>();
+    static {
+        canBeUnary.put("-", true);
+    }
 }

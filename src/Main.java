@@ -27,18 +27,21 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+        // String input0 = "a = 5 - 10; b = - 5;";
         // String input = "a = 5; b = 10 + a; c = a * b";
         // String input2 = "a = x AND b AND 8 AND n; if (wr < 10) { dg = uy}";
-        // LexemaParser.LexemaParserOutput lpo = LexemaParser.parce_string(input);
+        // LexemaParser.LexemaParserOutput lpo = LexemaParser.parce_string(input0);
         // SyntaxParser.SyntaxParserOutput spo;
         // try {
         //     spo = SyntaxParser.get_lexema_levels(lpo.output_lexema_list);
         //     List<Block> blocks = SyntaxParser.get_tree(spo, lpo.output_lexema_list);
-        //     CodeBlock cb = Generator.generate_code(blocks);
-        //     Optimizer.optimize(cb);
+        //     System.out.println(blocks.size());
+        //     // CodeBlock cb = Generator.generate_code(blocks);
+        //     // Optimizer.optimize(cb);
         //     // System.out.println(spo);
         // }
-        // catch (SyntaxParcerException ignored){
+        // catch (SyntaxParcerException i){
+        //     System.out.println(i.toString());
         // }
     }
 }

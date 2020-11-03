@@ -17,7 +17,7 @@ public class LexemaParser {
 
     private final static int DEFAULT_HASH_TABLE_SIZE = 255; // Длина хеш-таблицы
 
-    private final static String regex_pattern = "-?\\d+(.\\d+)*|[:(){}=<>;+\\-\\*\\\\]|[a-zA-Z0-9_]+";
+    private final static String regex_pattern = "-?\\d+(.\\d+)*|[:(){}=<>;+\\-\\*\\/]|[a-zA-Z0-9_]+";
 
     /**
      * Метод подготавливает исходную строку для прохода парсера.

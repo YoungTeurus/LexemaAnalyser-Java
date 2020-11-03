@@ -231,6 +231,8 @@ public class SyntaxParser {
                         Boolean use_left_neighbour = StaticRules.doesLexemaUsesLeftNeighbour.getOrDefault(
                                 node.getContent().get_char(), defaultDoesLexemaUsesLeftNeighbour);
 
+                        Boolean can_be_unary = canBeUnary.getOrDefault(node.getContent().get_char(), defaultCanBeUnary);
+
                         // Элементы возле оператора
                         TreeNode left_neighbour = null;
                         TreeNode right_neighbour;
@@ -271,8 +273,16 @@ public class SyntaxParser {
                             if (rulesCombo.leftRule.check(left_neighbour)) {
                                 node.setLeft(left_neighbour);
                             } else {
-                                throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Левый элемент для оператора " +
-                                        "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent())));
+                                // Если оператор не может быть унарным, то возвращаем ошибку...
+                                if (!can_be_unary){
+                                    throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Левый элемент для оператора " +
+                                            "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent())));
+                                }
+                                else {
+                                    // Иначе заносим в левый член null.
+                                    node.setLeft(null);
+                                    use_left_neighbour = false; // Устанавливаем флаг в состояние "не использовал левый член".
+                                }
                             }
                         }
 

@@ -147,12 +147,22 @@ public class Generator {
                     case "-": {
                         // Присваиваю вершине _value = ${last_id}
                         treeNode.getContent()._value = String.format("$%d", last_id++);
-                        // Код на вывод: LOAD left.value; ADD right.value; STORE top.value;
-                        codeBlock.addExpression(
-                                new CodeExpression()
-                                        .setCommand("LOAD")
-                                        .addArg(treeNode.getLeftValue().toString())
-                        );
+                        // Код на вывод: LOAD left.value; SUB right.value; STORE top.value;
+                        // Если знак унарный, то вместо left.value нужно подставить 0.
+                        if (treeNode.getLeft() == null){
+                            codeBlock.addExpression(
+                                    new CodeExpression()
+                                            .setCommand("LOAD")
+                                            .addArg("0")
+                            );
+                        }
+                        else{
+                            codeBlock.addExpression(
+                                    new CodeExpression()
+                                            .setCommand("LOAD")
+                                            .addArg(treeNode.getLeftValue().toString())
+                            );
+                        }
                         codeBlock.addExpression(
                                 new CodeExpression()
                                         .setCommand("SUB")
@@ -165,7 +175,9 @@ public class Generator {
                         );
                         // Дописываем код левой и правой частей в начало текущего кода:
                         codeBlock.addExpressions(0, right_block.getExpressions());
-                        codeBlock.addExpressions(0, left_block.getExpressions());
+                        if (treeNode.getLeft() != null) {
+                            codeBlock.addExpressions(0, left_block.getExpressions());
+                        }
                         break;
                     }
                     case "*": {
