@@ -13,7 +13,7 @@ public class Optimizer {
      * Список коммутативных операций.
      */
     static List<String> commutativeOperations = new ArrayList<>(Arrays.asList(
-            "ADD", "SUB", "MUL", "DIV", "AND", "OR", "XOR"
+            "ADD", "AND", "OR", "XOR"
     ));
 
     /**
