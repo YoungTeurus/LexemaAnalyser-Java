@@ -27,6 +27,7 @@ public class LexemaType {
     // Хеш-таблица "строковая - количество параметров"
     // Считается, что все лексемы, которые сюда не вошли, имеют два параметра.
     public static Map<String, Integer> lexemaParamCount = new HashMap<>();
+
     static {
         lexemaParamCount.put("not", 1);
     }

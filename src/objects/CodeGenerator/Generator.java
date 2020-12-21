@@ -9,9 +9,9 @@ import java.util.List;
 /**
  * Генератор кода на языке Ассемблера на основе обхода дерева, получившегося в результате синтаксического разбора
  * исходного текста программы.
- *
+ * <p>
  * Операторы Ассемблера (из методички):
- *
+ * <p>
  * "m" обозначает название ячейки памяти
  * LOAD m   : c(m) -> сумматор                              - загружает значение из ячейки m в сумматор
  * ADD m    : c(сумматор) + c(m) -> сумматор                - складывает значение из сумматора с значением в ячейке m и помещает результат в сумматор
@@ -24,8 +24,8 @@ import java.util.List;
  * XOR m    : c(сумматор) XOR c(m) -> сумматор              - совершает побитовую операцию ИСКЛЮЧАЮЩЕЕ ИЛИ над значением из сумматора и значением в ячейке m и помещает результат в сумматор
  * NOT      : NOT c(сумматор) -> сумматор                   - совершает побитовую операцию НЕ над значением в сумматоре и помещает результат в сумматор
  * CMP m    : if c(сумматор) == c(m) then FLAG = 0
- *            else c(сумматор) > c(m) then FLAG = 1
- *            else FLAG = -1
+ * else c(сумматор) > c(m) then FLAG = 1
+ * else FLAG = -1
  * - сравнивает значения в сумматоре со значением в ячейке m, и в случае их равенства устанавливает флаг равным 0, если значение в сумматоре больше - равным 1, иначе - -1.
  * JE m     : if FLAG == 0 then JUMP c(m)                   - если флаг равен 0 (результат сравенения - равно), совершает передачу управления строке, адрес (номер) которой равен значению в ячейке m
  * JN m     : if FLAG != 0 then JUMP c(m)
@@ -33,7 +33,7 @@ import java.util.List;
  * JS m     : if FLAG == -1 then JUMP c(m)                  - если флаг равен -1 (результат сравнения - меньше), совершает передачу управления строке, адрес (номер) которой равен значению в ячейке m
  * JMP m    : JUMP c(m)                                     - совершает безусловную передачу управления строке, адрес (номер) которой равен значению в ячейке m
  * JMP
- *
+ * <p>
  * "=m" обозначает численное значение
  * LOAD =m  : m -> сумматор                                 - помещает значение m в сумматор
  * ADD =m   : c(сумматор) + m -> сумматор                   - складывает значение из сумматора с значением m и помещает результат в сумматор
@@ -44,7 +44,7 @@ import java.util.List;
  * OR =m    : c(сумматор) OR m -> сумматор
  * XOR =m   : c(сумматор) XOR m -> сумматор
  * CMP =m   : if c(сумматор) == m then FLAG = 1 else FLAG = 0
- *
+ * <p>
  * Операторы исходного языка и соотносящийся им код Ассемблера:
  * a + b        -> ... b; STORE $b; LOAD $a; ADD $b;
  * a * b        -> ... b; STORE $b; LOAD $a; MUL $b;
@@ -61,24 +61,25 @@ public class Generator {
     /**
      * Гененрирует код для одного TreeNode, гененрируя код для каждого TreeNode, входящего в него.
      * Добавляет метки начала и конца блока.
+     *
      * @param block Block, для которого генерируется код.
-     * @see Block
      * @return CodeBlock, соответствующий коду для данного block.
+     * @see Block
      */
-    public static CodeBlock generate_code(Block block){
+    public static CodeBlock generate_code(Block block) {
         // Генерирует код для одного блока.
         if (block == null)
             return null;
         CodeBlock codeBlock = new CodeBlock();
 
-        for (TreeNode treeNode : block.content){
+        for (TreeNode treeNode : block.content) {
             codeBlock.addExpressions(generate_code(treeNode).getExpressions());
         }
 
-        if (codeBlock.size() == 0){
+        if (codeBlock.size() == 0) {
             codeBlock.addExpression(new CodeExpression().setCommand("NOP"));
         }
-        
+
         // Добавляем первому и последнему выржаению метки блока:
         codeBlock.get(0).addLabel(":BLOCK" + block.id);
         int last_i = codeBlock.size() - 1;
@@ -89,10 +90,11 @@ public class Generator {
 
     /**
      * Генерирует код для одного TreeNode, рекурсивно генерируя код для его правого и левого листа, если они есть.
+     *
      * @param treeNode TreeNode, для которого необходимо сгенерировать код.
      * @return CodeBlock, соответствующий коду для данного treeNode.
      */
-    public static CodeBlock generate_code(TreeNode treeNode){
+    public static CodeBlock generate_code(TreeNode treeNode) {
         if (treeNode == null)
             return null;
         CodeBlock codeBlock = new CodeBlock();
@@ -123,7 +125,7 @@ public class Generator {
                         );
                         codeBlock.addExpressions(0, right_block.getExpressions());
                         break;
-                        }
+                    }
                     case "+": {
                         // Присваиваю вершине _value = ${last_id}
                         treeNode.getContent()._value = String.format("$%d", last_id++);
@@ -153,14 +155,13 @@ public class Generator {
                         treeNode.getContent()._value = String.format("$%d", last_id++);
                         // Код на вывод: LOAD left.value; SUB right.value; STORE top.value;
                         // Если знак унарный, то вместо left.value нужно подставить 0.
-                        if (treeNode.getLeft() == null){
+                        if (treeNode.getLeft() == null) {
                             codeBlock.addExpression(
                                     new CodeExpression()
                                             .setCommand("LOAD")
                                             .addArg("0")
                             );
-                        }
-                        else{
+                        } else {
                             codeBlock.addExpression(
                                     new CodeExpression()
                                             .setCommand("LOAD")
@@ -256,7 +257,7 @@ public class Generator {
                         codeBlock.addExpressions(0, left_block.getExpressions());
                         break;
                     }
-                    case "OR":{
+                    case "OR": {
                         // Присваиваю вершине _value = ${last_id}
                         treeNode.getContent()._value = String.format("$%d", last_id++);
                         // Код на вывод: LOAD left.value; ADD right.value; STORE top.value;
@@ -280,7 +281,7 @@ public class Generator {
                         codeBlock.addExpressions(0, left_block.getExpressions());
                         break;
                     }
-                    case "XOR":{
+                    case "XOR": {
                         // Присваиваю вершине _value = ${last_id}
                         treeNode.getContent()._value = String.format("$%d", last_id++);
                         // Код на вывод: LOAD left.value; ADD right.value; STORE top.value;
@@ -304,15 +305,15 @@ public class Generator {
                         codeBlock.addExpressions(0, left_block.getExpressions());
                         break;
                     }
-                    case "NOT":{
+                    case "NOT": {
                         // Присваиваю вершине _value = ${last_id}
                         treeNode.getContent()._value = String.format("$%d", last_id++);
                         // Код на вывод: LOAD right.value; NOT; STORE top.value;
                         codeBlock.addExpression(
-                                    new CodeExpression()
-                                            .setCommand("LOAD")
-                                            .addArg(treeNode.getRightValue().toString())
-                            );
+                                new CodeExpression()
+                                        .setCommand("LOAD")
+                                        .addArg(treeNode.getRightValue().toString())
+                        );
                         codeBlock.addExpression(
                                 new CodeExpression()
                                         .setCommand("NOT")
@@ -344,7 +345,7 @@ public class Generator {
                         codeBlock.addExpressions(0, left_block.getExpressions());
                         break;
                     }
-                    case ">":{
+                    case ">": {
                         treeNode.getContent()._value = "JG";
                         codeBlock.addExpression(
                                 new CodeExpression()
@@ -361,7 +362,7 @@ public class Generator {
                         codeBlock.addExpressions(0, left_block.getExpressions());
                         break;
                     }
-                    case "==":{
+                    case "==": {
                         treeNode.getContent()._value = "JE";
                         codeBlock.addExpression(
                                 new CodeExpression()
@@ -378,7 +379,7 @@ public class Generator {
                         codeBlock.addExpressions(0, left_block.getExpressions());
                         break;
                     }
-                    case "!=":{
+                    case "!=": {
                         treeNode.getContent()._value = "JN";
                         codeBlock.addExpression(
                                 new CodeExpression()
@@ -395,7 +396,7 @@ public class Generator {
                         codeBlock.addExpressions(0, left_block.getExpressions());
                         break;
                     }
-                    case "IF":{
+                    case "IF": {
                         // Условие:
                         codeBlock.addExpressions(left_block.getExpressions());
                         // ._value IF-а - это количество строк условия + 1
@@ -430,17 +431,17 @@ public class Generator {
                         codeBlock.addExpression(new CodeExpression().setCommand("NOP"));
                         break;
                     }
-                    case "ELSE":{
-                        for(int i=0; i < (int)treeNode.getLeft().getContent()._value; i++){
+                    case "ELSE": {
+                        for (int i = 0; i < (int) treeNode.getLeft().getContent()._value; i++) {
                             codeBlock.addExpression(left_block.get(i));
                         }
                         codeBlock.addExpressions(right_block.getExpressions());
-                        for(int i= (int)treeNode.getLeft().getContent()._value; i < left_block.size(); i++){
+                        for (int i = (int) treeNode.getLeft().getContent()._value; i < left_block.size(); i++) {
                             codeBlock.addExpression(left_block.get(i));
                         }
                         break;
                     }
-                    case "IN":{
+                    case "IN": {
                         // Код на вывод: IN; STORE right.value;
                         codeBlock.addExpression(
                                 new CodeExpression()
@@ -455,7 +456,7 @@ public class Generator {
                         codeBlock.addExpressions(0, right_block.getExpressions());
                         break;
                     }
-                    case "OUT":{
+                    case "OUT": {
                         // Код на вывод: LOAD right.value; OUT;
                         codeBlock.addExpression(
                                 new CodeExpression()
@@ -479,20 +480,21 @@ public class Generator {
 
     /**
      * Генерирует код из блоков кода дерева разбора.
+     *
      * @param blocks Блоки кода, полученные на этапе синтаксического разбора.
      * @return CodeBlock, содеражащий код в виде CodeExpressions.
      */
-    public static CodeBlock generate_code(List<Block> blocks){
+    public static CodeBlock generate_code(List<Block> blocks) {
         // Готовый исходный код:
         last_id = 0;
         List<CodeBlock> Code = new ArrayList<>();
 
         Block main_block = blocks.get(0);
-        for (TreeNode treeNode : main_block.content){
+        for (TreeNode treeNode : main_block.content) {
             Code.add(generate_code(treeNode));
         }
         CodeBlock output_code = new CodeBlock();
-        for (CodeBlock codeBlock : Code){
+        for (CodeBlock codeBlock : Code) {
             output_code.addExpressions(codeBlock.getExpressions());
         }
 

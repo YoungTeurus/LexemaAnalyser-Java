@@ -102,14 +102,15 @@ public class LexemaParser {
      *  и список представления исходной строки в виде последовательности лексем.
      */
     public static LexemaParserOutput parce_string(String input_string){
-        input_string = LexemaParser.prepare_string(input_string);  // 0. Убрать все переносы строк
-
-        List<String> str_lexema_list = LexemaParser.get_lexemas(input_string); // 1. Найти последовательность строковых лексем
-        List<String> unique_str_lexema_list = new ListUniqieer<String>().unique_list(str_lexema_list); // 2. Найти уникальные строковые лексемы
+        // 0. Убрать все переносы строк
+        input_string = LexemaParser.prepare_string(input_string);
+        // 1. Найти последовательность строковых лексем
+        List<String> str_lexema_list = LexemaParser.get_lexemas(input_string);
+        // 2. Найти уникальные строковые лексемы
+        List<String> unique_str_lexema_list = new ListUniqieer<String>().unique_list(str_lexema_list);
         // 3. Создаём список объектов-лексем
         // 4. Создаём хеш-таблицу объектов-лексем
         LexemaParserOutput po = LexemaParser.get_object_lexema_list_and_str_object_lexema_hash_table(unique_str_lexema_list);
-
         // 5. Получаем выходной список
         po.output_lexema_list = LexemaParser.get_output_lexema_list(str_lexema_list, po.hashTable);
 

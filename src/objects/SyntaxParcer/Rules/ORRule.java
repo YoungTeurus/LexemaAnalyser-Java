@@ -9,7 +9,7 @@ public class ORRule implements IRule {
     private final IRule rule1;
     private final IRule rule2;
 
-    public ORRule(IRule rule1, IRule rule2){
+    public ORRule(IRule rule1, IRule rule2) {
         this.rule1 = rule1;
         this.rule2 = rule2;
     }

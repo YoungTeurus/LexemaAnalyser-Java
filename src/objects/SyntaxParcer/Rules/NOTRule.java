@@ -8,7 +8,7 @@ import objects.SyntaxParcer.SyntaxParts.TreeNode;
 public class NOTRule implements IRule {
     private final IRule rule;
 
-    public NOTRule(IRule rule){
+    public NOTRule(IRule rule) {
         this.rule = rule;
     }
 

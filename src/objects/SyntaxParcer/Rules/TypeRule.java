@@ -8,12 +8,13 @@ import objects.SyntaxParcer.SyntaxParts.TreeNode;
  */
 public class TypeRule implements IRule {
     private final Lexema.lexema_types checking_type;
-    public TypeRule (Lexema.lexema_types checking_type){
+
+    public TypeRule(Lexema.lexema_types checking_type) {
         this.checking_type = checking_type;
     }
 
     @Override
     public boolean check(TreeNode checking_node) {
-        return ((Lexema)checking_node.getContent()).get_type() == checking_type;
+        return ((Lexema) checking_node.getContent()).get_type() == checking_type;
     }
 }

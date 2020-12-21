@@ -30,20 +30,20 @@ public class SyntaxParser {
 
         // Заменяем все Lexema на TreeNode для облегчения работы в следующем методе.
         List<TreeNode> output_treenode_lexema_list = new ArrayList<>();
-        for (Lexema lex : output_lexema_list){
+        for (Lexema lex : output_lexema_list) {
             output_treenode_lexema_list.add(new TreeNode().setContent(lex));
         }
 
         /*
           Класс для хранения состояния парсера. Сохраняет уровни вложенности на момент входа во внутренний блок.
          */
-        class ParserState{
+        class ParserState {
             Block current_block;
             int current_expression;
             int current_level;
             int equals_added;
 
-            ParserState(Block current_block, int current_expression, int current_level, int equals_added){
+            ParserState(Block current_block, int current_expression, int current_level, int equals_added) {
                 this.current_block = current_block;
                 this.current_expression = current_expression;
                 this.current_level = current_level;
@@ -84,11 +84,11 @@ public class SyntaxParser {
 
 
         //TODO: как-то вынести хардкод
-        for (TreeNode node: output_treenode_lexema_list) {
+        for (TreeNode node : output_treenode_lexema_list) {
             boolean add_node_to_block = true;
             Lexema lex = node.getContent();
-            if (lex.get_type() == Lexema.lexema_types.OPERATOR){
-                if (lex.get_char().equals("=") || lex.get_char().equals("!=")){
+            if (lex.get_type() == Lexema.lexema_types.OPERATOR) {
+                if (lex.get_char().equals("=") || lex.get_char().equals("!=")) {
                     // Особый случай "=" - создаём новый уровень, который выше текущего
                     List<TreeNode> new_upper_level = new ArrayList<>();
                     new_upper_level.add(node);
@@ -96,13 +96,11 @@ public class SyntaxParser {
                     equals_added += 1;
                     current_level += 1;
                     level = levels.get(current_level);
-                }
-                else {
+                } else {
                     // Каждый оператор заносим на текущий уровень
                     level.add(node);
                 }
-            }
-            else if (lex.get_type() == Lexema.lexema_types.SPLITTER){
+            } else if (lex.get_type() == Lexema.lexema_types.SPLITTER) {
                 add_node_to_block = false;
                 switch (lex.get_char()) {
                     case "{":
@@ -131,7 +129,7 @@ public class SyntaxParser {
                         break;
                     case "}":
                         // Проверка на правильное количество открывающих и закрывающих скобок:
-                        if (current_level != equals_added){
+                        if (current_level != equals_added) {
                             // Если к концу выражения мы не находимся на стандартном уровне - что-то не так с вложенностью
                             throw new SyntaxParcerException(
                                     String.format(
@@ -169,7 +167,7 @@ public class SyntaxParser {
                         // Сбрасываем уровень, если встретили ";"
 
                         // Проверка на правильное количество открывающих и закрывающих скобок:
-                        if (current_level != equals_added){
+                        if (current_level != equals_added) {
                             // Если к концу выражения мы не находимся на стандартном уровне - что-то не так с вложенностью
                             throw new SyntaxParcerException(
                                     String.format(
@@ -194,13 +192,13 @@ public class SyntaxParser {
             }
 
             // Добалвяем Node в текущий блок
-            if (add_node_to_block){
+            if (add_node_to_block) {
                 current_block.content.add(node);
             }
         }
 
         // Проверяем, что закрыты все фигурные скобки:
-        if (!upper_states.empty()){
+        if (!upper_states.empty()) {
             throw new SyntaxParcerException(
                     "Уровень вложенности блоков нарушен! Проверьте количество фигурных скобок!"
             );
@@ -215,9 +213,9 @@ public class SyntaxParser {
     }
 
     public static List<Block> get_tree(SyntaxParserOutput spo,
-                                          List<Lexema> output_lexema_list) throws SyntaxParcerException {
+                                       List<Lexema> output_lexema_list) throws SyntaxParcerException {
         // Строим дерево с помощью списка уровня лексем
-        for (Block current_block : spo.blocks){
+        for (Block current_block : spo.blocks) {
             List<List<List<TreeNode>>> expressions = current_block.expressions;
             // Копия исходного листа, в котором будем хранить лексемы и TreeNode-ы
             for (List<List<TreeNode>> levels : expressions) {
@@ -274,11 +272,10 @@ public class SyntaxParser {
                                 node.setLeft(left_neighbour);
                             } else {
                                 // Если оператор не может быть унарным, то возвращаем ошибку...
-                                if (!can_be_unary){
+                                if (!can_be_unary) {
                                     throw new SyntaxParcerException(String.format("Найдена ошибка при разборе! Левый элемент для оператора " +
                                             "%s на позиции %d не подходит под правило!", node.getContent().get_char(), output_lexema_list.indexOf(node.getContent())));
-                                }
-                                else {
+                                } else {
                                     // Иначе заносим в левый член null.
                                     node.setLeft(null);
                                     use_left_neighbour = false; // Устанавливаем флаг в состояние "не использовал левый член".
@@ -306,9 +303,9 @@ public class SyntaxParser {
 
 
         //TODO: сделать проверку на наличие деревьев, НЕ входящих в конечное выражение, что является ошибкой.
-        for (Block block : spo.blocks){
-            for (TreeNode treeNode : block.content){
-                if (treeNode.is_leaf()){
+        for (Block block : spo.blocks) {
+            for (TreeNode treeNode : block.content) {
+                if (treeNode.is_leaf()) {
                     throw new SyntaxParcerException("Найдены незадействованные лексемы! Проверьте исходный код!");
                 }
             }

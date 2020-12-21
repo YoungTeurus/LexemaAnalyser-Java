@@ -21,8 +21,8 @@ public class StaticRules {
     // Любая константа: целочисленная/вещественная/булева
     public static final IRule ruleForAnyConst = new ORRule(
             new ORRule(
-                new TypeRule(Lexema.lexema_types.INT_CONST),
-                new TypeRule(Lexema.lexema_types.BOOL_CONST)
+                    new TypeRule(Lexema.lexema_types.INT_CONST),
+                    new TypeRule(Lexema.lexema_types.BOOL_CONST)
             ),
             new TypeRule(Lexema.lexema_types.FLOAT_CONST)
     );
@@ -37,7 +37,7 @@ public class StaticRules {
     public static final IRule ruleForArithmeticSign = new ORRule(
             new ORRule(new CharRule("+"), new CharRule("-")),
             new ORRule(new CharRule("*"), new CharRule("/"))
-            );
+    );
 
     // Проверка на принадлежность к логическим операторам
     public static final IRule ruleForBoolOperator = new ORRule(
@@ -64,7 +64,7 @@ public class StaticRules {
 
     private static final LeftRightRulesCombo leftRightRulesCombo_ForEqualSign =
             new LeftRightRulesCombo(ruleForEqualSignLeftNeighbour,
-            ruleForEqualSignRightNeighbour);
+                    ruleForEqualSignRightNeighbour);
 
     // Для стандартного оператора слева и справа может быть что угодно, кроме знака равно и указателя на блок.
     public static final IRule ruleForDefaultOperatorNeighbour = new ANDRule(
@@ -83,13 +83,14 @@ public class StaticRules {
 
     // Словарь типа "строковое_представление, правила_для_левого_и_правого_соседа".
     public static final Map<String, LeftRightRulesCombo> stringLeftRightRulesComboMap = new HashMap<>();
+
     static {
         stringLeftRightRulesComboMap.put("=", leftRightRulesCombo_ForEqualSign);
         stringLeftRightRulesComboMap.put(":=", leftRightRulesCombo_ForEqualSign);
-        stringLeftRightRulesComboMap.put("+",leftRightRulesCombo_ForArithmetic);
-        stringLeftRightRulesComboMap.put("-",leftRightRulesCombo_ForArithmetic);
-        stringLeftRightRulesComboMap.put("*",leftRightRulesCombo_ForArithmetic);
-        stringLeftRightRulesComboMap.put("/",leftRightRulesCombo_ForArithmetic);
+        stringLeftRightRulesComboMap.put("+", leftRightRulesCombo_ForArithmetic);
+        stringLeftRightRulesComboMap.put("-", leftRightRulesCombo_ForArithmetic);
+        stringLeftRightRulesComboMap.put("*", leftRightRulesCombo_ForArithmetic);
+        stringLeftRightRulesComboMap.put("/", leftRightRulesCombo_ForArithmetic);
         stringLeftRightRulesComboMap.put("IF", leftRightRulesCombo_ForIfOperator);
         stringLeftRightRulesComboMap.put("ELSE", leftRightRulesCombo_ForElseOperator);
     }
@@ -97,6 +98,7 @@ public class StaticRules {
     public static final Boolean defaultDoesLexemaUsesLeftNeighbour = true;
     // Словарь типа "строковое_представление, использует_ли_данный_оператор_левый_элемент"
     public static final Map<String, Boolean> doesLexemaUsesLeftNeighbour = new HashMap<>();
+
     static {
         doesLexemaUsesLeftNeighbour.put("NOT", false);
         doesLexemaUsesLeftNeighbour.put("IN", false);
@@ -106,12 +108,15 @@ public class StaticRules {
     // Смещение для поиска левого соседа
     public static final Integer defaultLeftNeighbourOffset = -1;
     public static final Map<String, Integer> leftNeighbourOffset = new HashMap<>();
+
     static {
         leftNeighbourOffset.put("IF", 1);
     }
+
     // Смещение для поиска правого соседа
     public static final Integer defaultRightNeighbourOffset = 1;
     public static final Map<String, Integer> rightNeighbourOffset = new HashMap<>();
+
     static {
         rightNeighbourOffset.put("IF", 2);
     }
@@ -119,6 +124,7 @@ public class StaticRules {
     // Может ли оператор быть унарным
     public static final Boolean defaultCanBeUnary = false;
     public static final Map<String, Boolean> canBeUnary = new HashMap<>();
+
     static {
         canBeUnary.put("-", true);
     }

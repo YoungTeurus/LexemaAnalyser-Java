@@ -8,7 +8,7 @@ import java.util.List;
  * Используется для содержания:
  * - главного списка деревьев;
  * - выполняемого кода условных переходов.
- *
+ * <p>
  * Блок не имеет никакого Value (в отличии от TreeNode).
  */
 public class Block {
@@ -18,7 +18,7 @@ public class Block {
     public List<TreeNode> content;  // Содержание блока - все TreeNode, которые входят в данный Block.
     public int id;  // Идентификатор блока
 
-    public Block(int id){
+    public Block(int id) {
         expressions = new ArrayList<>();
         content = new ArrayList<>();
         this.id = id;
