@@ -251,7 +251,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), items_to_remove.get(j));
             }
         }
 
@@ -324,7 +324,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), items_to_remove.get(j));
             }
         }
 
@@ -366,7 +366,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), items_to_remove.get(j));
             }
         }
 
@@ -417,7 +417,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), items_to_remove.get(j));
             }
         }
 
@@ -427,7 +427,7 @@ public class Optimizer {
     /**
      * 6) Оператор
      *      NOP;
-     * может быть удалён, если после него есть любая команда.
+     * может быть удалён, если после него есть любая команда, отличающаяся от NOP.
      * @return Возвращает true, если была сделана хотя бы одна замена, иначе вернёт false.
      */
     private static boolean ruleNumberEight(CodeBlock input_code){
@@ -436,8 +436,8 @@ public class Optimizer {
         boolean wasDeleted = false;
         List<Integer> items_to_remove = new ArrayList<>(); // Список индексов элементов, которые должны быть удалены
         for (CodeExpression currentExpression : input_code.getExpressions()) {
-            if (currentExpression.getCommand().equals("NOP") && i + 1 < size) {
-                // Если текущая команда является командой "NOP" и за ней есть ещё одна команда.
+            if (currentExpression.getCommand().equals("NOP") && i + 1 < size && !input_code.get(i + 1).getCommand().equals("NOP")) {
+                // Если текущая команда является командой "NOP" и за ней есть ещё одна команда, отличающаяся от NOP.
                 items_to_remove.add(i);
                 wasDeleted = true;
             }
@@ -447,7 +447,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), items_to_remove.get(j));
             }
         }
 
