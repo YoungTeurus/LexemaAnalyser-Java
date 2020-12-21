@@ -251,7 +251,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                input_code.getExpressions().remove((int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
             }
         }
 
@@ -324,7 +324,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                input_code.getExpressions().remove((int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
             }
         }
 
@@ -366,7 +366,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                input_code.getExpressions().remove((int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
             }
         }
 
@@ -417,7 +417,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                input_code.getExpressions().remove((int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
             }
         }
 
@@ -447,7 +447,7 @@ public class Optimizer {
         if (wasDeleted){
             // Удаляем элементы, начиная с последнего (чтобы не ломались индексы).
             for (int j = items_to_remove.size() - 1; j >= 0; j--){
-                input_code.getExpressions().remove((int)items_to_remove.get(j));
+                removeExpression(input_code.getExpressions(), (int)items_to_remove.get(j));
             }
         }
 
