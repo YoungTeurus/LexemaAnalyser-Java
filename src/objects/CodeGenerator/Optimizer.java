@@ -153,6 +153,22 @@ public class Optimizer {
     }
 
     /**
+     * Удаляет выражение из блока кода, перенося все связанные метки элементу ниже (при необходимости создавая пустой).
+     * @param itemIndexToRemove Индекс элемента для удаления.
+     */
+    private static void removeExpression(List<CodeExpression> expressions, int itemIndexToRemove){
+        if (itemIndexToRemove == expressions.size() - 1){
+            // Если удаляемый элемент является первым, создаём после него (в конце) NOP элемент
+            expressions.add(new CodeExpression().setCommand("NOP"));
+        }
+        CodeExpression expressionToRemove = expressions.get(itemIndexToRemove);
+        // Добавляем метки к элементу, идущему после нашего элемента:
+        expressions.get(itemIndexToRemove + 1).addLabels(expressionToRemove.getLabels());
+        // Удаляем исходный элемент:
+        expressions.remove(itemIndexToRemove);
+    }
+
+    /**
      * 1) Последовательность опреаторов
      *      LOAD VAR0;
      *      CMD VAR1;

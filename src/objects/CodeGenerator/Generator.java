@@ -74,6 +74,10 @@ public class Generator {
         for (TreeNode treeNode : block.content){
             codeBlock.addExpressions(generate_code(treeNode).getExpressions());
         }
+
+        if (codeBlock.size() == 0){
+            codeBlock.addExpression(new CodeExpression().setCommand("NOP"));
+        }
         
         // Добавляем первому и последнему выржаению метки блока:
         codeBlock.get(0).addLabel(":BLOCK" + block.id);
@@ -322,7 +326,7 @@ public class Generator {
                         codeBlock.addExpressions(0, right_block.getExpressions());
                         break;
                     }
-                    // TODO: объекденить код условных операторов, вынеся ._value в Lexema
+                    // TODO: объеденить код условных операторов, вынеся ._value в Lexema
                     case "<": {
                         treeNode.getContent()._value = "JS";
                         codeBlock.addExpression(

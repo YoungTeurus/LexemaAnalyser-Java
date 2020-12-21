@@ -38,6 +38,11 @@ public class CodeExpression {
         labels.add(label);
         return this;
     }
+    @SuppressWarnings("UnusedReturnValue")
+    public CodeExpression addLabels(List<String> labels){
+        this.labels.addAll(labels);
+        return this;
+    }
     public List<String> getLabels(){return labels;}
 
     @SuppressWarnings("UnusedReturnValue")
